@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile - Smarket</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/dropdown.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/password-toggle.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/profile.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <section id="main1">
+      <input
+        type="checkbox"
+        class="menu-btn"
+        id="menu-btn"
+        aria-label="menu-btn"
+      />
+
+      <!-- Header Icons -->
+      <header>
+        <div class="header-top">
+          <label for="menu-btn" class="menu-icon">
+            <span class="nav-icon"></span>
+          </label>
+
+          <div class="nav-location">
+            <a href="#"
+              ><i class="fa-solid fa-location-dot"></i>PUNE, MAHARASTRA</a
+            >
+          </div>
+
+          <a href="{{ url_for('index') }}" class="logo">
+            <img
+              src="{{ url_for('static', filename='images/LOGO.png') }}"
+              alt="logo"
+            />
+          </a>
+
+          <div class="nav-btn">
+            <a href="javascript:void(0);" class="nav-search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </a>
+            {% if current_user.is_authenticated %}
+            <ul class="nav-user-list">
+              <li class="nav-user logged-in">
+                <span class="user-greeting"
+                  >Hi, {{ current_user.name.split(' ')[0] }}<span
+                    class="arrow-down"
+                  ></span
+                ></span>
+                <div class="user-dropdown">
+                  {% if current_user.role == 'admin' %}
+                  <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                  {% elif current_user.role == 'seller' %}
+                  <a href="{{ url_for('seller_dashboard') }}">Dashboard</a>
+                  {% endif %}
+                  <a href="{{ url_for('profile') }}">Profile</a>
+                  <a href="{{ url_for('feedback') }}">Feedback</a>
+                  <a href="{{ url_for('my_orders') }}">My Orders</a>
+                  <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+              </li>
+            </ul>
+            {% else %}
+            <a href="javascript:void(0);" class="nav-user"
+              ><i class="fa-solid fa-user"></i>
+            </a>
+            {% endif %}
+            <a
+              href="{{ url_for('notifications') }}"
+              class="nav-notification"
+              id="notification-btn"
+            >
+              <i class="fa-solid fa-bell"></i>
+              <span id="notification-count" class="notification-badge">0</span>
+            </a>
+            <a href="{{ url_for('wishlist') }}" class="nav-wishlist">
+              <i class="fa-solid fa-heart"></i>
+              <span id="wishlist-count" class="notification-badge">0</span>
+            </a>
+            <a href="{{ url_for('cart') }}" class="nav-cart"
+              ><i class="fa-solid fa-bag-shopping"></i>
+              <span id="cart-count" class="notification-badge">0</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="navigation">
+          <ul class="menu">
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('index') }}#category">Category</a></li>
+            <li><a href="{{ url_for('index') }}#shopping-banner">Shop</a></li>
+            <li>
+              <a href="{{ url_for('index') }}#popular">Popular</a>
+              <span class="nav-label">Hot Offer</span>
+            </li>
+            <li><a href="{{ url_for('index') }}#recent-products">Recent</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div class="flash-message {{ category }}">
+        {{ message }}
+        <button onclick="this.parentElement.style.display='none';">
+          &times;
+        </button>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
+    </section>
+
+    <main class="profile-container">
+      <h1>Profile</h1>
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %} {% endif %} {% endwith %}
+      <form method="POST" class="profile-form">
+        <div class="form-group">
+          <label for="fullname">Full Name:</label>
+          <input
+            type="text"
+            id="fullname"
+            name="fullname"
+            value="{{ current_user.name }}"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input
+            type="email"
+            id="email"
+            value="{{ current_user.email }}"
+            disabled
+          />
+        </div>
+        <div class="form-group">
+          <label for="address">Shipping Address:</label>
+          <textarea
+            id="address"
+            name="address"
+            rows="4"
+            placeholder="Enter your full address for deliveries"
+          >
+{{ current_user.address or '' }}</textarea
+          >
+        </div>
+        <div class="form-group">
+          <label for="password"
+            >New Password (leave blank to keep current):</label
+          >
+          <div class="password-wrapper">
+            <input type="password" id="password" name="password" />
+            <i class="fa-solid fa-eye toggle-password"></i>
+          </div>
+        </div>
+        <button type="submit" class="btn">Update Profile</button>
+      </form>
+      <div class="profile-info">
+        <p><strong>Role:</strong> {{ current_user.role }}</p>
+        <p>
+          <strong>Joined:</strong> {{
+          current_user.date_joined.strftime('%Y-%m-%d') if
+          current_user.date_joined else 'N/A' }}
+        </p>
+        <div class="delete-account-wrapper">
+          <button id="delete-account-btn" class="btn btn-danger">
+            Delete Account
+          </button>
+        </div>
+      </div>
+
+      <!-- Delete confirmation modal -->
+      <div id="delete-modal" class="modal">
+        <div class="modal-content">
+          <h3>Confirm Account Deletion</h3>
+          <p>
+            Deleting your account is permanent and will remove your profile,
+            orders (if you are a buyer), listings (if possible), and other
+            related data. This action cannot be undone.
+          </p>
+          <div class="modal-actions">
+            <button id="cancel-delete" class="btn">Cancel</button>
+            <button id="confirm-delete" class="btn btn-danger">
+              Yes, Delete My Account
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/password-toggle.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/notifications-script.js') }}"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const deleteBtn = document.getElementById("delete-account-btn");
+        const modal = document.getElementById("delete-modal");
+        const cancelBtn = document.getElementById("cancel-delete");
+        const confirmBtn = document.getElementById("confirm-delete");
+
+        if (!deleteBtn) return;
+
+        deleteBtn.addEventListener("click", function () {
+          modal.style.display = "flex";
+        });
+
+        cancelBtn.addEventListener("click", function () {
+          modal.style.display = "none";
+        });
+
+        confirmBtn.addEventListener("click", async function () {
+          confirmBtn.disabled = true;
+          confirmBtn.textContent = "Deleting...";
+          try {
+            const resp = await fetch("/delete-account", { method: "POST" });
+            const data = await resp.json();
+            if (data.success) {
+              window.location.href = data.redirect || "/";
+            } else {
+              alert(data.message || "Failed to delete account.");
+              confirmBtn.disabled = false;
+              confirmBtn.textContent = "Yes, Delete My Account";
+            }
+          } catch (err) {
+            console.error("Delete failed", err);
+            alert("Failed to delete account. See console for details.");
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = "Yes, Delete My Account";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

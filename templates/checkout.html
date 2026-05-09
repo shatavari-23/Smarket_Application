@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmarKet</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/dropdown.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/checkout.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/password-toggle.css') }}"
+    />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='images/LOGO.png') }}"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  </head>
+  <body>
+    <section id="main1">
+      <input
+        type="checkbox"
+        class="menu-btn"
+        id="menu-btn"
+        aria-label="menu-btn"
+      />
+
+      <!-- Header Icons -->
+      <header>
+        <div class="header-top">
+          <label for="menu-btn" class="menu-icon">
+            <span class="nav-icon"></span>
+          </label>
+
+          <div class="nav-location">
+            <a
+              href="#"
+              title="Change Location"
+              aria-label="Current location: PUNE, MAHARASTRA"
+              ><i class="fa-solid fa-location-dot"></i>PUNE, MAHARASTRA</a
+            >
+          </div>
+
+          <a href="{{ url_for('index') }}" class="logo">
+            <img
+              src="{{ url_for('static', filename='images/LOGO.png') }}"
+              alt="logo"
+            />
+          </a>
+
+          <div class="nav-btn">
+            <a
+              href="javascript:void(0);"
+              class="nav-search"
+              aria-label="Search"
+            >
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </a>
+            {% if current_user.is_authenticated %}
+            <ul class="nav-user-list">
+              <li class="nav-user logged-in">
+                <span class="user-greeting"
+                  >Hi, {{ current_user.name.split(' ')[0] }}<span
+                    class="arrow-down"
+                  ></span
+                ></span>
+                <div class="user-dropdown">
+                  {% if current_user.role == 'admin' %}
+                  <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                  {% elif current_user.role == 'seller' %}
+                  <a href="{{ url_for('seller_dashboard') }}">Dashboard</a>
+                  {% endif %}
+                  <a href="{{ url_for('profile') }}">Profile</a>
+                  {% if current_user.role == 'buyer' %}
+                  <a href="{{ url_for('feedback') }}">Feedback</a>
+                  <a href="{{ url_for('my_orders') }}">My Orders</a>
+                  {% endif %}
+                  <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+              </li>
+            </ul>
+            {% else %}
+            <a
+              href="javascript:void(0);"
+              class="nav-user"
+              aria-label="Login or Sign up"
+              ><i class="fa-solid fa-user"></i>
+            </a>
+            {% endif %}
+            <a
+              href="{{ url_for('notifications') }}"
+              class="nav-notification"
+              id="notification-btn"
+              aria-label="Notifications"
+            >
+              <i class="fa-solid fa-bell"></i>
+              <span id="notification-count" class="notification-badge">0</span>
+            </a>
+            <a
+              href="{{ url_for('wishlist') }}"
+              class="nav-wishlist"
+              aria-label="Wishlist"
+            >
+              <i class="fa-solid fa-heart"></i>
+              <span id="wishlist-count" class="notification-badge">0</span>
+            </a>
+            <a href="{{ url_for('cart') }}" class="nav-cart" aria-label="Cart"
+              ><i class="fa-solid fa-bag-shopping"></i>
+              <span id="cart-count" class="notification-badge">0</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="navigation">
+          <ul class="menu">
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('index') }}#category">Category</a></li>
+            <li><a href="{{ url_for('index') }}#shopping-banner">Shop</a></li>
+            <li>
+              <a href="{{ url_for('index') }}#popular">Popular</a>
+              <span class="nav-label">Hot Offer</span>
+            </li>
+            <li><a href="{{ url_for('index') }}#recent-products">Recent</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div class="flash-message {{ category }}">
+        {{ message }}
+        <button onclick="this.parentElement.style.display='none';">
+          &times;
+        </button>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
+    </section>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <form class="search-input">
+        <input type="text" name="search" placeholder="Search For Product" />
+        <a
+          href="javascript:void(0);"
+          class="search-cancel"
+          aria-label="Close search"
+          ><i class="fa-solid fa-xmark"></i>
+        </a>
+      </form>
+    </div>
+
+    <!-- Login/Register Form -->
+    <div class="form">
+      <div class="login-form">
+        <a
+          href="javascript:void(0);"
+          class="form-cancel"
+          aria-label="Close login form"
+          ><i class="fa-solid fa-xmark"></i>
+        </a>
+        <strong>Login</strong>
+        <div
+          id="g_id_onload"
+          data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+          data-context="signin"
+          data-ux_mode="popup"
+          data-login_uri="http://localhost:5000/login"
+          data-auto_select="true"
+          data-itp_support="true"
+          data-callback="handleCredentialResponse"
+          data-auto_prompt="false"
+        ></div>
+        <div
+          class="g_id_signin"
+          data-type="standard"
+          data-shape="pill"
+          data-theme="outline"
+          data-text="signin_with"
+          data-size="large"
+          data-logo_alignment="left"
+        ></div>
+        <form>
+          <input type="email" name="email" placeholder="Email" required />
+          <div class="password-wrapper">
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              required
+            />
+            <i class="fa-solid fa-eye toggle-password"></i>
+          </div>
+          <label for="login-role" class="form-label">Role</label>
+          <select id="login-role" name="role" required>
+            <option value="" disabled selected>Select Role</option>
+            <option value="admin">Admin</option>
+            <option value="seller">Seller</option>
+            <option value="buyer">Buyer</option>
+          </select>
+          <input type="submit" value="Login" />
+        </form>
+        <div class="form-btn">
+          <a href="#" class="forget">Forget Your Password?</a>
+          <a href="javascript:void(0);" class="sign-up-btn">Create Account</a>
+        </div>
+      </div>
+
+      <div class="signup-form">
+        <a
+          href="javascript:void(0);"
+          class="form-cancel"
+          aria-label="Close signup form"
+          ><i class="fa-solid fa-xmark"></i>
+        </a>
+        <strong>Sign Up</strong>
+        <form>
+          <input type="text" name="Fullname" placeholder="Full Name" required />
+          <input type="email" name="email" placeholder="Email" required />
+          <div class="password-wrapper">
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              required
+            />
+            <i class="fa-solid fa-eye toggle-password"></i>
+          </div>
+          <label for="signup-role" class="form-label">Role</label>
+          <select id="signup-role" name="role" required>
+            <option value="" disabled selected>Select Role</option>
+            <option value="admin">Admin</option>
+            <option value="seller">Seller</option>
+            <option value="buyer">Buyer</option>
+          </select>
+          <input type="submit" value="Sign Up" />
+        </form>
+        <div class="form-btn">
+          <a href="javascript:void(0);" class="already-account"
+            >Already Have an Account?
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div id="qr-code-modal" class="qr-modal">
+      <div class="qr-modal-content">
+        <span class="qr-close-btn">&times;</span>
+        <h2>Scan to Pay</h2>
+        <div id="qrcode-container"></div>
+        <p>
+          Scan with any UPI app
+          <span class="upi-app-examples"
+            >(Google Pay, PhonePe, Paytm, etc.)</span
+          >
+        </p>
+        <p class="payment-instruction">
+          After completing the payment, click the button below to confirm.
+        </p>
+        <button id="confirm-paid-btn" class="btn-place-order">
+          I Have Paid
+        </button>
+      </div>
+    </div>
+
+    <!-- Payment Section -->
+    <div class="checkout-container">
+      <!-- Order Summary Section -->
+      <div class="order-summary">
+        <h2>Order Summary</h2>
+        <ul id="order-items-list" class="order-items-list">
+          <!-- Order items will be dynamically added here by JavaScript -->
+        </ul>
+
+        <div class="order-total-section">
+          <p>Subtotal: <span id="subtotal-price">₹0.00</span></p>
+          <p>Shipping: <span id="shipping-price">Free</span></p>
+          <hr />
+          <p>Total: <span id="total-price" class="total-price">₹0.00</span></p>
+        </div>
+      </div>
+
+      <!-- Payment Details Section -->
+      <div class="payment-details">
+        <h2>Payment Details</h2>
+        <div class="payment-options">
+          <button id="upi-option" class="active">UPI</button>
+          <button id="cod-option">Cash on Delivery</button>
+        </div>
+
+        <div id="upi-form" class="payment-form-content active">
+          <div class="alert-message">
+            <strong>Pay Securely:</strong> Click the button below to generate a
+            secure QR code for UPI payment.
+          </div>
+          <button id="show-qr-btn" class="btn-show-qr">
+            <i class="fas fa-qrcode"></i> Pay with QR Code
+          </button>
+        </div>
+
+        <div id="cod-form" class="payment-form-content">
+          <div class="alert-message">
+            <strong>Order Confirmation:</strong> Pay with cash when your order
+            is delivered to your doorstep.
+          </div>
+          <button id="place-order-btn" class="btn-place-order">
+            Place Order
+          </button>
+        </div>
+
+        <button
+          id="back-to-cart-btn"
+          class="btn-back-to-cart"
+          onclick="window.location.href='/cart'; return false;"
+        >
+          Back to Cart
+        </button>
+      </div>
+      <div id="order-message"></div>
+    </div>
+
+    <!-- Service Box -->
+    <section class="services">
+      <div class="service-box">
+        <i class="fa-solid fa-truck-fast"></i>
+        <span>Free Shipping</span>
+        <p>Free shipping for all orders</p>
+      </div>
+
+      <div class="service-box">
+        <i class="fa-solid fa-headphones"></i>
+        <span>Support 24/7</span>
+        <p>We Support 24H a day</p>
+      </div>
+
+      <div class="service-box">
+        <i class="fa-solid fa-rotate"></i>
+        <span>100% Money Back</span>
+        <p>You have 30 days to return</p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-container">
+        <div class="footer-company-box">
+          <a href="{{ url_for('index') }}" class="footer-logo">
+            <img
+              src="{{ url_for('static', filename='images/LOGO.png') }}"
+              alt="logo"
+            />
+          </a>
+          <p>
+            SmarKet is a unique online platform dedicated to celebrating student
+            creativity.
+          </p>
+          <div class="footer-social">
+            <a href="#" aria-label="Facebook">
+              <i class="fa-brands fa-facebook"></i>
+            </a>
+            <a href="#" aria-label="Instagram">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-link-box">
+          <strong>Main Links</strong>
+          <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('index') }}#category">Categories</a></li>
+            <li><a href="{{ url_for('index') }}#shopping-banner">Shop</a></li>
+            <li><a href="{{ url_for('index') }}#popular">Popular</a></li>
+            <li><a href="{{ url_for('index') }}#recent-products">Recent</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-subscribe">
+          <strong>Subscribe Now</strong>
+          <p>Fresh products, straight to your inbox.</p>
+          <form class="subscribe-box">
+            <input type="email" placeholder="Email" name="subscribe" required />
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>MADE BY SMARKET</span>
+        <span>&copy; COPYRIGHT 2025 - SMARKET</span>
+      </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/password-toggle.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script type="text/javascript">
+      document.addEventListener("DOMContentLoaded", function () {
+        const qrModal = document.getElementById("qr-code-modal");
+        const showQrBtn = document.getElementById("show-qr-btn");
+        const closeQrBtn = document.querySelector(".qr-close-btn");
+
+        const placeOrderBtn = document.getElementById("place-order-main-btn");
+        const orderMessage = document.getElementById("order-message");
+
+        var socket = io.connect(
+          "http://" + document.domain + ":" + location.port
+        );
+
+        socket.on("connect", function () {
+          console.log("Socket.IO connected!");
+        });
+
+        socket.on("update_notification_count", function (data) {
+          document.getElementById("notification-count").innerText = data.count;
+        });
+
+        // Payment option switching
+        const paymentButtons = document.querySelectorAll(
+          ".payment-options button"
+        );
+        const paymentForms = document.querySelectorAll(".payment-form-content");
+        paymentButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            paymentButtons.forEach((btn) => btn.classList.remove("active"));
+            paymentForms.forEach((form) => form.classList.remove("active"));
+            this.classList.add("active");
+            const targetForm = document.getElementById(
+              this.id.replace("-option", "-form")
+            );
+            if (targetForm) targetForm.classList.add("active");
+
+            // Show/hide the correct primary button based on selection
+            if (this.id === "upi-option") {
+              // For UPI, the QR button is the primary action, so hide the main place order button
+              document.getElementById("place-order-main-btn").style.display =
+                "none";
+              // The COD button is inside its own div, which is now hidden.
+            } else {
+              // For COD, show the main place order button
+              const codPlaceOrderBtn = document.querySelector(
+                "#cod-form .btn-place-order"
+              );
+              // We will use a single button to avoid confusion.
+              document.getElementById("place-order-main-btn").style.display =
+                "block";
+            }
+          });
+        });
+        // Trigger a click on the default active button to set the initial state
+        document.querySelector(".payment-options button.active").click();
+
+        // QR Code Modal Logic
+        showQrBtn.addEventListener("click", async function () {
+          this.disabled = true;
+          this.textContent = "Generating...";
+
+          try {
+            const initResponse = await fetch("/api/payment/initiate", {
+              method: "POST",
+            });
+            const initData = await initResponse.json();
+
+            if (!initResponse.ok) {
+              if (
+                initData.message &&
+                initData.message.includes("shipping address")
+              ) {
+                showToast(initData.message, "error");
+                setTimeout(() => {
+                  window.location.href = "{{ url_for('profile') }}";
+                }, 3000);
+              } else {
+                showToast(
+                  initData.message || "Could not start payment.",
+                  "error"
+                );
+              }
+              this.disabled = false;
+              this.textContent = "Pay with QR Code";
+              return;
+            }
+
+            const { order_id, total_amount } = initData;
+
+            // --- IMPORTANT: Replace with your actual business details ---
+            const payeeVPA = "pranalinalavde05@okhdfcbank";
+            const payeeName = "SmarKet"; // Your Business Name
+            const transactionNote = `Payment for Order #${order_id}`;
+            // ---
+
+            const upiString = `upi://pay?pa=${payeeVPA}&pn=${encodeURIComponent(
+              payeeName
+            )}&am=${total_amount.toFixed(2)}&cu=INR&tn=${encodeURIComponent(
+              transactionNote
+            )}`;
+
+            const qrContainer = document.getElementById("qrcode-container");
+            qrContainer.innerHTML = ""; // Clear previous QR code
+            new QRCode(qrContainer, {
+              text: upiString,
+              width: 200,
+              height: 200,
+            });
+
+            // Attach order ID to the confirmation button
+            document.getElementById("confirm-paid-btn").dataset.orderId =
+              order_id;
+
+            qrModal.style.display = "block";
+          } catch (error) {
+            console.error("Payment initiation error:", error);
+            showToast("An error occurred. Please try again.", "error");
+          } finally {
+            this.disabled = false;
+            this.textContent = "Pay with QR Code";
+          }
+        });
+
+        // Handle the "I Have Paid" button click
+        document
+          .getElementById("confirm-paid-btn")
+          .addEventListener("click", async function () {
+            const orderId = this.dataset.orderId;
+            this.disabled = true;
+            this.textContent = "Confirming...";
+
+            try {
+              const response = await fetch(`/api/payment/confirm/${orderId}`, {
+                method: "POST",
+              });
+              const result = await response.json();
+
+              if (response.ok) {
+                const successMessage = `<div class="success-message">Order #${result.order_id} confirmed! Redirecting...</div>`;
+                qrModal.querySelector(".qr-modal-content").innerHTML =
+                  successMessage;
+                setTimeout(() => {
+                  window.location.href =
+                    "{{ url_for('my_orders') }}?highlight=" + result.order_id;
+                }, 2000);
+              } else {
+                showToast(result.message || "Confirmation failed.", "error");
+                this.disabled = false;
+                this.textContent = "I Have Paid";
+              }
+            } catch (error) {
+              console.error("Payment confirmation error:", error);
+              showToast("An error occurred during confirmation.", "error");
+              this.disabled = false;
+              this.textContent = "I Have Paid";
+            }
+          });
+
+        // Place order handler for COD
+        document
+          .querySelector("#cod-form .btn-place-order")
+          .addEventListener("click", async function (e) {
+            e.preventDefault();
+            this.disabled = true;
+            this.textContent = "Placing Order...";
+            const response = await fetch("{{ url_for('place_order') }}", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ payment_method: "cod" }),
+            });
+            const result = await response.json();
+            if (response.ok) {
+              const successMessage = `Order #${result.order_id} placed successfully!`;
+              if (typeof showToast === "function") {
+                showToast(successMessage, "success");
+              } else {
+                alert(successMessage);
+              }
+              setTimeout(() => {
+                window.location.href =
+                  "{{ url_for('my_orders') }}?highlight=" + result.order_id;
+              }, 2000);
+            } else {
+              const errorMessage = result.message || "Failed to place order.";
+              if (typeof showToast === "function") {
+                showToast(errorMessage, "error");
+              } else {
+                alert(errorMessage);
+              }
+              this.disabled = false;
+              this.textContent = "Place Order";
+            }
+          });
+
+        // Close QR Modal
+        closeQrBtn.onclick = function () {
+          qrModal.style.display = "none";
+        };
+        window.onclick = function (event) {
+          if (event.target == qrModal) qrModal.style.display = "none";
+        };
+      });
+    </script>
+  </body>
+</html>

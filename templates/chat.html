@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat - Conversation {{ conversation_id }}</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/dropdown.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/chat.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body
+    data-conversation-id="{{ conversation_id }}"
+    data-current-user-id="{{ current_user_id }}"
+    data-current-user-name="{{ current_user_name }}"
+  >
+    <section id="main1">
+      <!-- Header content from other templates -->
+      <input
+        type="checkbox"
+        class="menu-btn"
+        id="menu-btn"
+        aria-label="menu-btn"
+      />
+      <header>
+        <div class="header-top">
+          <label for="menu-btn" class="menu-icon">
+            <span class="nav-icon"></span>
+          </label>
+          <div class="nav-location">
+            <a
+              href="#"
+              title="Change Location"
+              aria-label="Current location: PUNE, MAHARASTRA"
+            >
+              <i class="fa-solid fa-location-dot"></i>PUNE, MAHARASTRA
+            </a>
+          </div>
+          <a href="{{ url_for('index') }}" class="logo">
+            <img
+              src="{{ url_for('static', filename='images/LOGO.png') }}"
+              alt="logo"
+            />
+          </a>
+          <div class="nav-btn">
+            <a
+              href="javascript:void(0);"
+              class="nav-search"
+              aria-label="Search"
+            >
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </a>
+            {% if current_user.is_authenticated %}
+            <ul class="nav-user-list">
+              <li class="nav-user logged-in">
+                <span class="user-greeting"
+                  >Hi, {{ current_user_name.split(' ')[0] }}<span
+                    class="arrow-down"
+                  ></span
+                ></span>
+                <div class="user-dropdown">
+                  {% if current_user_role == 'admin' %}
+                  <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                  {% elif current_user_role == 'seller' %}
+                  <a href="{{ url_for('seller_dashboard') }}">Dashboard</a>
+                  {% endif %}
+                  <a href="{{ url_for('profile') }}">Profile</a>
+                  {% if current_user_role == 'buyer' %}
+                  <a href="{{ url_for('feedback') }}">Feedback</a>
+                  <a href="{{ url_for('my_orders') }}">My Orders</a>
+                  {% endif %}
+                  <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+              </li>
+            </ul>
+            {% else %}
+            <a
+              href="javascript:void(0);"
+              class="nav-user"
+              aria-label="Login or Sign up"
+            >
+              <i class="fa-solid fa-user"></i>
+            </a>
+            {% endif %}
+            <a
+              href="{{ url_for('notifications') }}"
+              class="nav-notification"
+              id="notification-btn"
+              aria-label="Notifications"
+            >
+              <i class="fa-solid fa-bell"></i>
+              <span id="notification-count" class="notification-badge">0</span>
+            </a>
+            <a
+              href="{{ url_for('wishlist') }}"
+              class="nav-wishlist"
+              aria-label="Wishlist"
+            >
+              <i class="fa-solid fa-heart"></i>
+              <span id="wishlist-count" class="notification-badge">0</span>
+            </a>
+            <a href="{{ url_for('cart') }}" class="nav-cart" aria-label="Cart">
+              <i class="fa-solid fa-bag-shopping"></i>
+              <span id="cart-count" class="notification-badge">0</span>
+            </a>
+          </div>
+        </div>
+        <nav class="navigation">
+          <ul class="menu">
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('index') }}#category">Category</a></li>
+            <li><a href="{{ url_for('index') }}#shopping-banner">Shop</a></li>
+            <li>
+              <a href="{{ url_for('index') }}#popular">Popular</a
+              ><span class="nav-label">Hot Offer</span>
+            </li>
+            <li><a href="{{ url_for('index') }}#recent-products">Recent</a></li>
+          </ul>
+        </nav>
+      </header>
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div class="flash-message {{ category }}">
+        {{ message }}
+        <button onclick="this.parentElement.style.display='none';">
+          &times;
+        </button>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
+      <div class="chat-container">
+        <div class="chat-header">
+          <span id="chat-partner-name">Loading chat...</span>
+          <a href="{{ url_for('index') }}" title="Back to Home"
+            ><i class="fa-solid fa-home"></i
+          ></a>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+          <!-- Messages will be loaded here -->
+        </div>
+        <div class="chat-input">
+          <textarea
+            id="message-input"
+            placeholder="Type your message..."
+            rows="1"
+          ></textarea>
+          <button id="send-button" aria-label="Send Message">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const conversationId = parseInt(document.body.dataset.conversationId);
+        const currentUserId = parseInt(document.body.dataset.currentUserId);
+        const currentUserName = document.body.dataset.currentUserName;
+        const chatMessagesDiv = document.getElementById("chat-messages");
+        const messageInput = document.getElementById("message-input");
+        const sendButton = document.getElementById("send-button");
+        const chatPartnerNameSpan =
+          document.getElementById("chat-partner-name");
+
+        var socket = io.connect(
+          "http://" + document.domain + ":" + location.port
+        );
+
+        socket.on("connect", function () {
+          console.log("Socket.IO connected!");
+          socket.emit("join_conversation", { conversation_id: conversationId });
+        });
+
+        socket.on("new_message", function (message) {
+          // If this message carries a temp_id that matches an optimistic message,
+          // replace the optimistic message instead of appending a duplicate.
+          if (message.temp_id) {
+            const optimisticEl = chatMessagesDiv.querySelector(
+              `[data-temp-id="${message.temp_id}"]`
+            );
+            if (optimisticEl) {
+              // Update the optimistic element's content/timestamp and mark with real id
+              const ts = message.timestamp_ms
+                ? new Date(message.timestamp_ms).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : message.timestamp
+                ? new Date(message.timestamp).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "";
+              const bubble = optimisticEl.querySelector(".message-bubble");
+              if (bubble) {
+                const contentEl = bubble.querySelector(".message-content");
+                const timeEl = bubble.querySelector(".message-timestamp");
+                if (contentEl) contentEl.textContent = message.content;
+                if (timeEl) timeEl.textContent = ts;
+              }
+              // remove temp-id attribute now that it's persisted
+              optimisticEl.removeAttribute("data-temp-id");
+              return (chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight);
+            }
+          }
+
+          // Otherwise append as usual
+          displayMessage(message);
+          chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+        });
+
+        async function loadMessages() {
+          try {
+            const response = await fetch(
+              `/api/conversations/${conversationId}/messages`
+            );
+            const messages = await response.json();
+            chatMessagesDiv.innerHTML = "";
+            messages.forEach((msg) => displayMessage(msg));
+            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+
+            if (messages.length > 0) {
+              const otherUser =
+                messages[0].sender_id === currentUserId
+                  ? messages[0].receiver_name
+                  : messages[0].sender_name;
+              chatPartnerNameSpan.textContent = `Chat with ${otherUser}`;
+            } else {
+              // Fallback if no messages yet
+              chatPartnerNameSpan.textContent = "Start of conversation";
+            }
+          } catch (error) {
+            console.error("Failed to load messages:", error);
+          }
+        }
+
+        function displayMessage(message, opts = {}) {
+          const messageDiv = document.createElement("div");
+          messageDiv.classList.add("message");
+          messageDiv.classList.add(
+            message.sender_id === currentUserId ? "sent" : "received"
+          );
+
+          const timestamp = message.timestamp_ms
+            ? new Date(message.timestamp_ms).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+            : message.timestamp
+            ? new Date(message.timestamp).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+            : "";
+
+          messageDiv.innerHTML = `
+            <div class="message-bubble">
+                ${
+                  message.sender_id !== currentUserId
+                    ? `<div class="message-sender">${message.sender_name}</div>`
+                    : ""
+                }
+                <div class="message-content">${message.content}</div>
+                <div class="message-timestamp">${timestamp}</div>
+            </div>
+        `;
+          if (opts && opts.tempId) {
+            messageDiv.setAttribute("data-temp-id", opts.tempId);
+          }
+          chatMessagesDiv.appendChild(messageDiv);
+          return messageDiv;
+        }
+
+        function sendMessage() {
+          const content = messageInput.value.trim();
+          if (content) {
+            // Optimistically display the message for the sender.
+            // The server will broadcast the official version.
+            // Create a temporary id so we can match the optimistic message with the
+            // server-confirmed message and avoid duplicates.
+            const tempId =
+              "t_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+            const optimisticMessage = {
+              sender_id: currentUserId,
+              sender_name: currentUserName,
+              content: content,
+              timestamp: new Date().toISOString(),
+              timestamp_ms: Date.now(),
+              temp_id: tempId,
+            };
+            displayMessage(optimisticMessage, { tempId: tempId });
+            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+            socket.emit("send_message", {
+              conversation_id: conversationId,
+              content: content,
+              temp_id: tempId,
+            });
+            messageInput.value = "";
+          }
+        }
+
+        sendButton.addEventListener("click", sendMessage);
+        messageInput.addEventListener("keypress", function (e) {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+          }
+        });
+
+        loadMessages();
+      });
+    </script>
+  </body>
+</html>

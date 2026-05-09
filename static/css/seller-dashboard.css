@@ -1,0 +1,343 @@
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: var(--main-dark);
+    color: #fff;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: var(--main-color);
+}
+
+.sidebar nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar nav a {
+    display: block;
+    padding: 15px;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar nav a:hover {
+    background-color: #7a828e;
+}
+
+.main-content2 {
+    flex-grow: 1;
+    padding: 30px;
+    background-color: #fff;
+}
+
+h3 {
+    color: var(--main-dark);
+    border-bottom: 2px solid var(--main-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.upload-form .form-group {
+    margin-bottom: 20px;
+}
+
+.upload-form label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.upload-form input, .upload-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.btn {
+    background-color: var(--main-color);
+    color: var(--main-dark);
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: var(--main-light);
+}
+
+.product-list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.product-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.product-info {
+    padding: 15px;
+}
+
+.product-info h4 {
+    margin: 10px 0;
+    font-size: 1.2em;
+}
+
+.product-info p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.product-info .price {
+    font-weight: bold;
+    color: var(--main-dark);
+    font-size: 1.1em;
+}
+
+.delete-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+}
+
+
+.product-info .edit-btn,
+.product-info .delete-btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.product-info .edit-btn {
+    background-color: #3498db; /* Blue */
+}
+
+.product-info .edit-btn:hover {
+    background-color: #2980b9;
+}
+
+.product-info .delete-btn {
+    background-color: #e74c3c; /* Red */
+    margin-left: 5px;
+}
+
+/* Cancel button on upload form */
+#cancel-edit-btn {
+  display: none;
+}
+
+.order-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.order-item {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: var(--product-bg-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+.order-header h3 {
+    color: var(--main-dark);
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.order-status {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.order-status.processing {
+    background-color: #fff3cd;
+    color: #664d03;
+}
+
+.order-status.shipped {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.order-status.delivered {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.order-status.cancelled {
+    background-color: #f8d7da;
+    color: #58151c;
+}
+
+.order-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.order-detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-detail strong {
+    color: var(--main-dark);
+}
+
+.order-items {
+    margin-top: 15px;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.order-items h4 {
+    color: var(--main-dark);
+    margin-bottom: 10px;
+}
+
+.order-item-summary {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.order-item-summary img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.order-item-summary .item-info {
+    flex: 1;
+}
+
+.order-item-summary .item-info h5 {
+    margin: 0 0 5px 0;
+    font-size: 1rem;
+    color: #333;
+}
+
+.order-item-summary .item-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.order-total {
+    margin-top: 15px;
+    text-align: right;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--main-dark);
+}
+
+.order-actions {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.order-status-select {
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    color: var(--main-dark);
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.order-status-select:hover {
+    border-color: #aaa;
+}
+
+.order-status-select:focus {
+    outline: none;
+    border-color: var(--main-dark);
+    box-shadow: 0 0 0 2px rgba(86, 97, 113, 0.2);
+}
+
+.btn-update-status {
+    background-color: var(--main-color);
+    color: var(--main-dark);
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.btn-update-status:hover {
+    background-color: var(--main-light);
+}

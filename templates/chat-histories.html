@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmarKet - Chat Histories</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/dropdown.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/notifications.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/password-toggle.css') }}"
+    />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='images/LOGO.png') }}"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
+    />
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+      /* Additional styles for chat histories */
+      #chat-histories-section {
+        margin-top: 2rem;
+        padding: 1rem;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+      }
+      #chat-histories-section h2 {
+        margin-bottom: 1rem;
+      }
+      .chat-history-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #ddd;
+      }
+      .chat-history-item:last-child {
+        border-bottom: none;
+      }
+      .chat-history-info {
+        flex-grow: 1;
+        cursor: pointer;
+        color: #333; /* Dark text for visibility */
+        background-color: #fff; /* White background for contrast */
+        padding: 0.3rem 0.5rem;
+        border-radius: 4px;
+      }
+      .chat-history-info:hover {
+        text-decoration: underline;
+        background-color: #e6e6e6;
+      }
+      .chat-history-delete-btn {
+        background-color: #e74c3c;
+        border: none;
+        color: white;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+      .chat-history-delete-btn:hover {
+        background-color: #c0392b;
+      }
+      .unread-count {
+        background-color: #ff4d4d;
+        color: white;
+        padding: 0.1rem 0.4rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <section id="main1">
+      <input
+        type="checkbox"
+        class="menu-btn"
+        id="menu-btn"
+        aria-label="menu-btn"
+      />
+
+      <!-- Header Icons -->
+      <header>
+        <div class="header-top">
+          <label for="menu-btn" class="menu-icon">
+            <span class="nav-icon"></span>
+          </label>
+
+          <div class="nav-location">
+            <a
+              href="#"
+              title="Change Location"
+              aria-label="Current location: PUNE, MAHARASTRA"
+              ><i class="fa-solid fa-location-dot"></i>PUNE, MAHARASTRA</a
+            >
+          </div>
+
+          <a href="{{ url_for('index') }}" class="logo">
+            <img
+              src="{{ url_for('static', filename='images/LOGO.png') }}"
+              alt="logo"
+            />
+          </a>
+
+          <div class="nav-btn">
+            <a
+              href="javascript:void(0);"
+              class="nav-search"
+              aria-label="Search"
+            >
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </a>
+            {% if current_user.is_authenticated %}
+            <ul class="nav-user-list">
+              <li class="nav-user logged-in">
+                <span class="user-greeting"
+                  >Hi, {{ current_user.name.split(' ')[0] }}<span
+                    class="arrow-down"
+                  ></span
+                ></span>
+                <div class="user-dropdown">
+                  {% if current_user.role == 'admin' %}
+                  <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                  {% elif current_user.role == 'seller' %}
+                  <a href="{{ url_for('seller_dashboard') }}">Dashboard</a>
+                  {% endif %}
+                  <a href="{{ url_for('profile') }}">Profile</a>
+                  <a href="{{ url_for('feedback') }}">Feedback</a>
+                  <a href="{{ url_for('my_orders') }}">My Orders</a>
+                  <a href="{{ url_for('chat_histories') }}">Chat Histories</a>
+                  <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+              </li>
+            </ul>
+            {% else %}
+            <a
+              href="javascript:void(0);"
+              class="nav-user"
+              aria-label="Login or Sign up"
+              ><i class="fa-solid fa-user"></i>
+            </a>
+            {% endif %}
+            <a
+              href="{{ url_for('notifications') }}"
+              class="nav-notification"
+              id="notification-btn"
+              aria-label="Notifications"
+            >
+              <i class="fa-solid fa-bell"></i>
+              <span id="notification-count" class="notification-badge">0</span>
+            </a>
+            <a
+              href="{{ url_for('wishlist') }}"
+              class="nav-wishlist"
+              aria-label="Wishlist"
+            >
+              <i class="fa-solid fa-heart"></i>
+              <span id="wishlist-count" class="notification-badge">0</span>
+            </a>
+            <a href="{{ url_for('cart') }}" class="nav-cart" aria-label="Cart"
+              ><i class="fa-solid fa-bag-shopping"></i>
+              <span id="cart-count" class="notification-badge">0</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="navigation">
+          <ul class="menu">
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('index') }}#category">Category</a></li>
+            <li><a href="{{ url_for('index') }}#shopping-banner">Shop</a></li>
+            <li>
+              <a href="{{ url_for('index') }}#popular">Popular</a>
+              <span class="nav-label">Hot Offer</span>
+            </li>
+            <li><a href="{{ url_for('index') }}#recent-products">Recent</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div class="flash-message {{ category }}">
+        {{ message }}
+        <button onclick="this.parentElement.style.display='none';">
+          &times;
+        </button>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
+    </section>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <form class="search-input">
+        <input type="text" name="search" placeholder="Search For Product" />
+        <a
+          href="javascript:void(0);"
+          class="search-cancel"
+          aria-label="Close search"
+          ><i class="fa-solid fa-xmark"></i>
+        </a>
+      </form>
+    </div>
+
+    <!-- Login/Register Form -->
+    <div class="form">
+      <div class="login-form">
+        <a
+          href="javascript:void(0);"
+          class="form-cancel"
+          aria-label="Close login form"
+          ><i class="fa-solid fa-xmark"></i>
+        </a>
+        <strong>Login</strong>
+        <div
+          id="g_id_onload"
+          data-client_id="622188751872-jo2somck3cjmapo0cubb0m60clh50un7.apps.googleusercontent.com"
+          data-context="signin"
+          data-ux_mode="popup"
+          data-callback="handleCredentialResponse"
+          data-auto_prompt="false"
+        ></div>
+        <div
+          class="g_id_signin"
+          data-type="standard"
+          data-shape="pill"
+          data-theme="outline"
+          data-text="signin_with"
+          data-size="large"
+          data-logo_alignment="left"
+        ></div>
+        <form>
+          <input type="email" name="email" placeholder="Email" required />
+          <div class="password-wrapper">
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              required
+            />
+            <i class="fa-solid fa-eye toggle-password"></i>
+          </div>
+          <label for="login-role" class="form-label">Role</label>
+          <select id="login-role" name="role" required>
+            <option value="" disabled selected>Select Role</option>
+            <option value="admin">Admin</option>
+            <option value="seller">Seller</option>
+            <option value="buyer">Buyer</option>
+          </select>
+          <input type="submit" value="Login" />
+        </form>
+        <div class="form-btn">
+          <a href="#" class="forget">Forget Your Password?</a>
+          <a href="javascript:void(0);" class="sign-up-btn">Create Account</a>
+        </div>
+      </div>
+
+      <div class="signup-form">
+        <a
+          href="javascript:void(0);"
+          class="form-cancel"
+          aria-label="Close signup form"
+          ><i class="fa-solid fa-xmark"></i>
+        </a>
+        <strong>Sign Up</strong>
+        <form>
+          <input type="text" name="Fullname" placeholder="Full Name" required />
+          <input type="email" name="email" placeholder="Email" required />
+          <div class="password-wrapper">
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              required
+            />
+            <i class="fa-solid fa-eye toggle-password"></i>
+          </div>
+          <label for="signup-role" class="form-label">Role</label>
+          <select id="signup-role" name="role" required>
+            <option value="" disabled selected>Select Role</option>
+            <option value="admin">Admin</option>
+            <option value="seller">Seller</option>
+            <option value="buyer">Buyer</option>
+          </select>
+          <input type="submit" value="Sign Up" />
+        </form>
+        <div class="form-btn">
+          <a href="javascript:void(0);" class="already-account"
+            >Already Have an Account?
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Histories Section -->
+    <section id="chat-histories-section">
+      <div class="notifications-container">
+        <div class="section-title">
+          <h2>Chat Histories</h2>
+        </div>
+        <div class="chat-histories-list"></div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-container">
+        <div class="footer-company-box">
+          <a href="{{ url_for('index') }}" class="footer-logo">
+            <img
+              src="{{ url_for('static', filename='images/LOGO.png') }}"
+              alt="logo"
+            />
+          </a>
+          <p>
+            SmarKet is a unique online platform dedicated to celebrating student
+            creativity.
+          </p>
+          <div class="footer-social">
+            <a href="#" aria-label="Facebook">
+              <i class="fa-brands fa-facebook"></i>
+            </a>
+            <a href="#" aria-label="Instagram">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-link-box">
+          <strong>Main Links</strong>
+          <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('index') }}#category">Categories</a></li>
+            <li><a href="{{ url_for('index') }}#shopping-banner">Shop</a></li>
+            <li><a href="{{ url_for('index') }}#popular">Popular</a></li>
+            <li><a href="{{ url_for('index') }}#recent-products">Recent</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-subscribe">
+          <strong>Subscribe Now</strong>
+          <p>Fresh products, straight to your inbox.</p>
+          <form class="subscribe-box">
+            <input type="email" placeholder="Email" name="subscribe" required />
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>MADE BY SMARKET</span>
+        <span>&copy; COPYRIGHT 2025 - SMARKET</span>
+      </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='js/chat-histories-script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/password-toggle.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>

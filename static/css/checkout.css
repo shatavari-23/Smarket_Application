@@ -1,0 +1,218 @@
+
+/* CHECKOUT PAGE STYLES*/
+.checkout-container {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap;
+  gap: 30px;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 2rem auto;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  align-items: flex-start;
+}
+
+.order-summary, .payment-details {
+  flex: 0 0 auto;
+  min-width: 300px;
+}
+
+/* Set proportional widths for a clean two-column layout */
+.order-summary {
+  width: 60%;
+}
+.payment-details {
+  width: 35%;
+}
+
+.order-summary h2, .payment-details h2 {
+    border-bottom: 2px solid var(--main-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.order-items-list {
+    list-style: none;
+    padding: 0;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.order-total-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.order-total-section p {
+    display: flex;
+    justify-content: space-between;
+    margin: 8px 0;
+    font-size: 1rem;
+}
+
+.order-total-section .total-price {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: var(--main-dark);
+}
+
+.payment-options {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.payment-options button {
+    flex-grow: 1;
+    padding: 12px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.payment-options button.active {
+    background-color: var(--main-dark);
+    color: white;
+    border-color: var(--main-dark);
+}
+
+.payment-form-content {
+    display: none;
+}
+
+.payment-form-content.active {
+    display: block;
+}
+
+.payment-form-content .alert-message {
+    margin-bottom: 15px;
+}
+
+.btn-place-order, .btn-back-to-cart, .btn-show-qr {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+    text-align: center;
+}
+
+.btn-place-order {
+    background-color: var(--main-color);
+    color: var(--main-dark);
+}
+.btn-place-order:hover {
+    background-color: var(--main-light);
+}
+
+.btn-show-qr {
+  background-color: #333;
+  color: white;
+}
+.btn-show-qr:hover {
+  background-color: #555;
+}
+.btn-show-qr i {
+  margin-right: 8px;
+}
+
+/* QR Code Modal Styles */
+.qr-modal {
+  display: none;
+  position: fixed;
+  z-index: 1001; /* Higher than header */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+  animation: fadeIn 0.3s;
+}
+.qr-modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px 30px;
+  border: 1px solid #888;
+  width: 90%;
+  max-width: 380px;
+  border-radius: 10px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  animation: slideIn 0.4s;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideIn { from { transform: translateY(-50px); } to { transform: translateY(0); } }
+
+#qrcode-container {
+  margin: 20px auto;
+  display: flex;
+  justify-content: center;
+}
+.qr-modal-content .upi-app-examples {
+  font-weight: 600;
+  color: var(--main-dark);
+}
+
+.qr-modal-content .payment-waiting-message {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-top: 20px;
+}
+
+.qr-modal-content .payment-instruction {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.qr-close-btn {
+  color: #aaa;
+  position: absolute;
+  top: 5px;
+  right: 15px;
+  font-size: 32px; /* Increased font size */
+  font-weight: bold;
+  line-height: 1;
+  transition: color 0.3s;
+}
+
+.qr-close-btn:hover,
+.qr-close-btn:focus {
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.qr-modal-content .btn-place-order {
+  margin-top: 20px;
+  background-color: #28a745; /* Green color for confirmation */
+}
+.qr-modal-content .btn-place-order:hover {
+  background-color: #218838;
+}
+
+/* Responsive: stack columns on small screens */
+@media (max-width: 900px) {
+  .checkout-container {
+    flex-direction: column !important;
+    flex-wrap: wrap;
+  }
+  .order-summary, .payment-details {
+    width: 100%;
+    min-width: unset;
+  }
+}

@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmarKet</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/dropdown.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/password-toggle.css') }}"
+    />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='images/LOGO.png') }}"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
+    />
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  </head>
+  <body>
+    <section id="main1">
+      <input
+        type="checkbox"
+        class="menu-btn"
+        id="menu-btn"
+        aria-label="menu-btn"
+      />
+
+      <!-- Header Icons -->
+      <header>
+        <div class="header-top">
+          <label for="menu-btn" class="menu-icon">
+            <span class="nav-icon"></span>
+          </label>
+
+          <div class="nav-location">
+            <a href="#"
+              ><i class="fa-solid fa-location-dot"></i>PUNE, MAHARASTRA</a
+            >
+          </div>
+
+          <a href="{{ url_for('index') }}" class="logo">
+            <img
+              src="{{ url_for('static', filename='images/LOGO.png') }}"
+              alt="logo"
+            />
+          </a>
+
+          <div class="nav-btn">
+            <a href="javascript:void(0);" class="nav-search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </a>
+            {% if current_user.is_authenticated %}
+            <ul class="nav-user-list">
+              <li class="nav-user logged-in">
+                <span class="user-greeting"
+                  >Hi, {{ current_user.name.split(' ')[0] }}<span
+                    class="arrow-down"
+                  ></span
+                ></span>
+                <div class="user-dropdown">
+                  {% if current_user.role == 'admin' %}
+                  <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                  {% elif current_user.role == 'seller' %}
+                  <a href="{{ url_for('seller_dashboard') }}">Dashboard</a>
+                  {% endif %}
+                  <a href="{{ url_for('profile') }}">Profile</a>
+                  <a href="{{ url_for('my_orders') }}">My Orders</a>
+                  <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+              </li>
+            </ul>
+            {% else %}
+            <a href="javascript:void(0);" class="nav-user"
+              ><i class="fa-solid fa-user"></i>
+            </a>
+            {% endif %}
+            <a
+              href="{{ url_for('notifications') }}"
+              class="nav-notification"
+              id="notification-btn"
+            >
+              <i class="fa-solid fa-bell"></i>
+              <span id="notification-count" class="notification-badge">0</span>
+            </a>
+            <a href="{{ url_for('wishlist') }}" class="nav-wishlist">
+              <i class="fa-solid fa-heart"></i>
+              <span id="wishlist-count" class="notification-badge">0</span>
+            </a>
+            <a href="{{ url_for('cart') }}" class="nav-cart"
+              ><i class="fa-solid fa-bag-shopping"></i>
+              <span id="cart-count" class="notification-badge">0</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="navigation">
+          <ul class="menu">
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('index') }}#category">Category</a></li>
+            <li><a href="{{ url_for('index') }}#shopping-banner">Shop</a></li>
+            <li>
+              <a href="{{ url_for('index') }}#popular">Popular</a>
+              <span class="nav-label">Hot Offer</span>
+            </li>
+            <li><a href="{{ url_for('index') }}#recent-products">Recent</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div class="flash-message {{ category }}">
+        {{ message }}
+        <button onclick="this.parentElement.style.display='none';">
+          &times;
+        </button>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
+    </section>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <form class="search-input">
+        <input type="text" name="search" placeholder="Search For Product" />
+        <a href="javascript:void(0);" class="search-cancel"
+          ><i class="fa-solid fa-xmark"></i>
+        </a>
+      </form>
+    </div>
+
+    <!-- Login/Register Form -->
+    <div class="form">
+      <div class="login-form">
+        <a href="javascript:void(0);" class="form-cancel"
+          ><i class="fa-solid fa-xmark"></i>
+        </a>
+        <strong>Login</strong>
+        <div
+          id="g_id_onload"
+          data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+          data-context="signin"
+          data-ux_mode="popup"
+          data-login_uri="http://localhost:5000/login"
+          data-auto_select="true"
+          data-itp_support="true"
+          data-callback="handleCredentialResponse"
+          data-auto_prompt="false"
+        ></div>
+        <div
+          class="g_id_signin"
+          data-type="standard"
+          data-shape="pill"
+          data-theme="outline"
+          data-text="signin_with"
+          data-size="large"
+          data-logo_alignment="left"
+        ></div>
+        <form>
+          <input type="email" name="email" placeholder="Email" required />
+          <div class="password-wrapper">
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              required
+            />
+            <i class="fa-solid fa-eye toggle-password"></i>
+          </div>
+          <label for="login-role" class="form-label">Role</label>
+          <select id="login-role" name="role" required>
+            <option value="" disabled selected>Select Role</option>
+            <option value="admin">Admin</option>
+            <option value="seller">Seller</option>
+            <option value="buyer">Buyer</option>
+          </select>
+          <input type="submit" value="Login" />
+        </form>
+        <div class="form-btn">
+          <a href="#" class="forget">Forget Your Password?</a>
+          <a href="javascript:void(0);" class="sign-up-btn">Create Account</a>
+        </div>
+      </div>
+
+      <div class="signup-form">
+        <a href="javascript:void(0);" class="form-cancel"
+          ><i class="fa-solid fa-xmark"></i>
+        </a>
+        <strong>Sign Up</strong>
+        <form>
+          <input type="text" name="Fullname" placeholder="Full Name" required />
+          <input type="email" name="email" placeholder="Email" required />
+          <div class="password-wrapper">
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              required
+            />
+            <i class="fa-solid fa-eye toggle-password"></i>
+          </div>
+          <label for="signup-role" class="form-label">Role</label>
+          <select id="signup-role" name="role" required>
+            <option value="" disabled selected>Select Role</option>
+            <option value="admin">Admin</option>
+            <option value="seller">Seller</option>
+            <option value="buyer">Buyer</option>
+          </select>
+          <input type="submit" value="Sign Up" />
+        </form>
+        <div class="form-btn">
+          <a href="javascript:void(0);" class="already-account"
+            >Already Have an Account?
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category -->
+    <section id="category">
+      <a
+        href="{{ url_for('category', category_name='baked-goods') }}"
+        class="category-box"
+      >
+        <div class="category-box-img">
+          <img
+            src="{{ url_for('static', filename='images/Baked Goods/RedVelvetCupcake-bg.png') }}"
+            alt="Baked Goods"
+          />
+          <strong>Baked Goods</strong>
+        </div>
+      </a>
+      <a
+        href="{{ url_for('category', category_name='jewellery') }}"
+        class="category-box"
+      >
+        <div class="category-box-img">
+          <img
+            src="{{ url_for('static', filename='images/Jewellery/Pink_Bow-Pearl_Necklace-bg.png') }}"
+            alt="Handmade Jewellery"
+          />
+          <strong>Jewellery</strong>
+        </div>
+      </a>
+      <a
+        href="{{ url_for('category', category_name='clothes') }}"
+        class="category-box"
+      >
+        <div class="category-box-img">
+          <img
+            src="{{ url_for('static', filename='images/Clothes/Blue_Top_Flower-Printed_-bg.png') }}"
+            alt="Clothes"
+          />
+          <strong>Clothes</strong>
+        </div>
+      </a>
+      <a
+        href="{{ url_for('category', category_name='paintings') }}"
+        class="category-box"
+      >
+        <div class="category-box-img">
+          <img
+            src="{{ url_for('static', filename='images/Paintings/Winnie_The_Pooh-bg.png') }}"
+            alt="Paintings"
+          />
+          <strong>Paintings</strong>
+        </div>
+      </a>
+    </section>
+
+    <!-- Baked Goods -->
+    <section id="recent-products">
+      <h2>Baked Goods</h2>
+
+      <!-- container -->
+      <div class="recent-product-container">
+        <!-- box1 -->
+        <div class="product-box">
+          <!-- img -->
+          <a
+            href="{{ url_for('product', product_id='504') }}"
+            class="product-box-img"
+          >
+            <img
+              src="{{ url_for('static', filename='images/Baked Goods/CaramelChocolateTart 1.jpg') }}"
+              alt="Baked Goods"
+            />
+            <div class="wishlist-btn" data-product-id="504">
+              <i class="fa-regular fa-heart"></i>
+            </div>
+          </a>
+          <!-- text -->
+          <div class="product-box-text">
+            <a
+              href="{{ url_for('product', product_id='504') }}"
+              class="product-text-title"
+              >Caramel Chocolate Tart</a
+            >
+            <span>₹199</span>
+            <button
+              class="product-cart-btn"
+              data-product-id="504"
+              data-product-name="Caramel Chocolate Tart"
+              data-product-price="199"
+              data-product-category="Baked Goods"
+              data-product-image="{{ url_for('static', filename='images/Baked Goods/CaramelChocolateTart 1.jpg') }}"
+            >
+              <i class="fa-solid fa-cart-shopping"></i>Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- box2 -->
+        <div class="product-box">
+          <!-- img -->
+          <a
+            href="{{ url_for('product', product_id='503') }}"
+            class="product-box-img"
+          >
+            <img
+              src="{{ url_for('static', filename='images/Baked Goods/BlackForestPastry.webp') }}"
+              alt="Baked Goods"
+            />
+            <div class="wishlist-btn" data-product-id="503">
+              <i class="fa-regular fa-heart"></i>
+            </div>
+          </a>
+          <!-- text -->
+          <div class="product-box-text">
+            <a
+              href="{{ url_for('product', product_id='503') }}"
+              class="product-text-title"
+              >Black Forest Pastry</a
+            >
+            <span>₹199</span>
+            <button
+              class="product-cart-btn"
+              data-product-id="503"
+              data-product-name="Black Forest Pastry"
+              data-product-price="199"
+              data-product-category="Baked Goods"
+              data-product-image="{{ url_for('static', filename='images/Baked Goods/BlackForestPastry.webp') }}"
+            >
+              <i class="fa-solid fa-cart-shopping"></i>Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- box3 -->
+        <div class="product-box">
+          <!-- img -->
+          <a
+            href="{{ url_for('product', product_id='505') }}"
+            class="product-box-img"
+          >
+            <img
+              src="{{ url_for('static', filename='images/Baked Goods/ChocoChipBrownie1.jpg') }}"
+              alt="Baked Goods"
+            />
+            <div class="wishlist-btn" data-product-id="505">
+              <i class="fa-regular fa-heart"></i>
+            </div>
+          </a>
+          <!-- text -->
+          <div class="product-box-text">
+            <a
+              href="{{ url_for('product', product_id='505') }}"
+              class="product-text-title"
+              >ChocoChips Brownie</a
+            >
+            <span>₹190</span>
+            <button
+              class="product-cart-btn"
+              data-product-id="505"
+              data-product-name="ChocoChips Brownie"
+              data-product-price="190"
+              data-product-category="Baked Goods"
+              data-product-image="{{ url_for('static', filename='images/Baked Goods/ChocoChipBrownie1.jpg') }}"
+            >
+              <i class="fa-solid fa-cart-shopping"></i>Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- box4 -->
+        <div class="product-box">
+          <!-- img -->
+          <a
+            href="{{ url_for('product', product_id='506') }}"
+            class="product-box-img"
+          >
+            <img
+              src="{{ url_for('static', filename='images/Baked Goods/ChocoholicPastry.jpg') }}"
+              alt="Baked Goods"
+            />
+            <div class="wishlist-btn" data-product-id="506">
+              <i class="fa-regular fa-heart"></i>
+            </div>
+          </a>
+          <!-- text -->
+          <div class="product-box-text">
+            <a
+              href="{{ url_for('product', product_id='506') }}"
+              class="product-text-title"
+              >Chocoholic Pastry</a
+            >
+            <span>₹189</span>
+            <button
+              class="product-cart-btn"
+              data-product-id="506"
+              data-product-name="Chocoholic Pastry"
+              data-product-price="189"
+              data-product-category="Baked Goods"
+              data-product-image="{{ url_for('static', filename='images/Baked Goods/ChocoholicPastry.jpg') }}"
+            >
+              <i class="fa-solid fa-cart-shopping"></i>Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- box5 -->
+        <div class="product-box">
+          <!-- img -->
+          <a
+            href="{{ url_for('product', product_id='502') }}"
+            class="product-box-img"
+          >
+            <img
+              src="{{ url_for('static', filename='images/Baked Goods/ChocolateCoatedBiscuits.webp') }}"
+              alt="Baked Goods"
+            />
+            <div class="wishlist-btn" data-product-id="502">
+              <i class="fa-regular fa-heart"></i>
+            </div>
+          </a>
+          <!-- text -->
+          <div class="product-box-text">
+            <a
+              href="{{ url_for('product', product_id='502') }}"
+              class="product-text-title"
+              >Chocolate Coated Biscuits</a
+            >
+            <span>₹199</span>
+            <button
+              class="product-cart-btn"
+              data-product-id="502"
+              data-product-name="Chocolate Coated Biscuits"
+              data-product-price="199"
+              data-product-category="Baked Goods"
+              data-product-image="{{ url_for('static', filename='images/Baked Goods/ChocolateCoatedBiscuits.webp') }}"
+            >
+              <i class="fa-solid fa-cart-shopping"></i>Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- box6 -->
+        <div class="product-box">
+          <!-- img -->
+          <a
+            href="{{ url_for('product', product_id='507') }}"
+            class="product-box-img"
+          >
+            <img
+              src="{{ url_for('static', filename='images/Baked Goods/ChocolateCupcake.webp') }}"
+              alt="Baked Goods"
+            />
+            <div class="wishlist-btn" data-product-id="507">
+              <i class="fa-regular fa-heart"></i>
+            </div>
+          </a>
+          <!-- text -->
+          <div class="product-box-text">
+            <a
+              href="{{ url_for('product', product_id='507') }}"
+              class="product-text-title"
+              >Chocolate Cupcake</a
+            >
+            <span>₹190</span>
+            <button
+              class="product-cart-btn"
+              data-product-id="507"
+              data-product-name="Chocolate Cupcake"
+              data-product-price="190"
+              data-product-category="Baked Goods"
+              data-product-image="{{ url_for('static', filename='images/Baked Goods/ChocolateCupcake.webp') }}"
+            >
+              <i class="fa-solid fa-cart-shopping"></i>Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- box7 -->
+        <div class="product-box">
+          <!-- img -->
+          <a
+            href="{{ url_for('product', product_id='508') }}"
+            class="product-box-img"
+          >
+            <img
+              src="{{ url_for('static', filename='images/Baked Goods/CookieBrownie_1.jpg') }}"
+              alt="Baked Goods"
+            />
+            <div class="wishlist-btn" data-product-id="508">
+              <i class="fa-regular fa-heart"></i>
+            </div>
+          </a>
+          <!-- text -->
+          <div class="product-box-text">
+            <a
+              href="{{ url_for('product', product_id='508') }}"
+              class="product-text-title"
+              >Cookie Brownie</a
+            >
+            <span>₹190</span>
+            <button
+              class="product-cart-btn"
+              data-product-id="508"
+              data-product-name="Cookie Brownie"
+              data-product-price="190"
+              data-product-category="Baked Goods"
+              data-product-image="{{ url_for('static', filename='images/Baked Goods/CookieBrownie_1.jpg') }}"
+            >
+              <i class="fa-solid fa-cart-shopping"></i>Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- box8 -->
+        <div class="product-box">
+          <!-- img -->
+          <a
+            href="{{ url_for('product', product_id='509') }}"
+            class="product-box-img"
+          >
+            <img
+              src="{{ url_for('static', filename='images/Baked Goods/DarkChocolateMoussePastry-Square.webp') }}"
+              alt="Baked Goods"
+            />
+            <div class="wishlist-btn" data-product-id="509">
+              <i class="fa-regular fa-heart"></i>
+            </div>
+          </a>
+          <!-- text -->
+          <div class="product-box-text">
+            <a
+              href="{{ url_for('product', product_id='509') }}"
+              class="product-text-title"
+              >Dark Chocolate Mousse Pastry</a
+            >
+            <span>₹169</span>
+            <button
+              class="product-cart-btn"
+              data-product-id="509"
+              data-product-name="Dark Chocolate Mousse Pastry"
+              data-product-price="169"
+              data-product-category="Baked Goods"
+              data-product-image="{{ url_for('static', filename='images/Baked Goods/DarkChocolateMoussePastry-Square.webp') }}"
+            >
+              <i class="fa-solid fa-cart-shopping"></i>Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- box9 -->
+        <div class="product-box">
+          <!-- img -->
+          <a
+            href="{{ url_for('product', product_id='5010') }}"
+            class="product-box-img"
+          >
+            <img
+              src="{{ url_for('static', filename='images/Baked Goods/EgglessDoubleChocolateChipCookiesDip_1.webp') }}"
+              alt="Baked Goods"
+            />
+            <div class="wishlist-btn" data-product-id="5010">
+              <i class="fa-regular fa-heart"></i>
+            </div>
+          </a>
+          <!-- text -->
+          <div class="product-box-text">
+            <a
+              href="{{ url_for('product', product_id='5010') }}"
+              class="product-text-title"
+              >Double ChocolateChip Cookies</a
+            >
+            <span>₹190</span>
+            <button
+              class="product-cart-btn"
+              data-product-id="5010"
+              data-product-name="Double ChocolateChip Cookies"
+              data-product-price="190"
+              data-product-category="Baked Goods"
+              data-product-image="{{ url_for('static', filename='images/Baked Goods/EgglessDoubleChocolateChipCookiesDip_1.webp') }}"
+            >
+              <i class="fa-solid fa-cart-shopping"></i>Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- box10 -->
+        <div class="product-box">
+          <!-- img -->
+          <a
+            href="{{ url_for('product', product_id='5011') }}"
+            class="product-box-img"
+          >
+            <img
+              src="{{ url_for('static', filename='images/Baked Goods/EgglessFreshCreamPineapplePastry_1.webp') }}"
+              alt="Baked Goods"
+            />
+            <div class="wishlist-btn" data-product-id="5011">
+              <i class="fa-regular fa-heart"></i>
+            </div>
+          </a>
+          <!-- text -->
+          <div class="product-box-text">
+            <a
+              href="{{ url_for('product', product_id='5011') }}"
+              class="product-text-title"
+              >Fresh Cream Pineapple Pastry</a
+            >
+            <span>₹159</span>
+            <button
+              class="product-cart-btn"
+              data-product-id="5011"
+              data-product-name="Fresh Cream Pineapple Pastry"
+              data-product-price="159"
+              data-product-category="Baked Goods"
+              data-product-image="{{ url_for('static', filename='images/Baked Goods/EgglessFreshCreamPineapplePastry_1.webp') }}"
+            >
+              <i class="fa-solid fa-cart-shopping"></i>Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- box11 -->
+        <div class="product-box">
+          <!-- img -->
+          <a
+            href="{{ url_for('product', product_id='5012') }}"
+            class="product-box-img"
+          >
+            <img
+              src="{{ url_for('static', filename='images/Baked Goods/RagiCrackers-Square.webp') }}"
+              alt="Baked Goods"
+            />
+            <div class="wishlist-btn" data-product-id="5012">
+              <i class="fa-regular fa-heart"></i>
+            </div>
+          </a>
+          <!-- text -->
+          <div class="product-box-text">
+            <a
+              href="{{ url_for('product', product_id='5012') }}"
+              class="product-text-title"
+              >Ragi Crackers</a
+            >
+            <span>₹190</span>
+            <button
+              class="product-cart-btn"
+              data-product-id="5012"
+              data-product-name="Ragi Crackers"
+              data-product-price="190"
+              data-product-category="Baked Goods"
+              data-product-image="{{ url_for('static', filename='images/Baked Goods/RagiCrackers-Square.webp') }}"
+            >
+              <i class="fa-solid fa-cart-shopping"></i>Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- box12 -->
+        <div class="product-box">
+          <!-- img -->
+          <a
+            href="{{ url_for('product', product_id='5013') }}"
+            class="product-box-img"
+          >
+            <img
+              src="{{ url_for('static', filename='images/Baked Goods/RedVelvetCupcake.webp') }}"
+              alt="Baked Goods"
+            />
+            <div class="wishlist-btn" data-product-id="5013">
+              <i class="fa-regular fa-heart"></i>
+            </div>
+          </a>
+          <!-- text -->
+          <div class="product-box-text">
+            <a
+              href="{{ url_for('product', product_id='5013') }}"
+              class="product-text-title"
+              >Red Velvet Cupcake</a
+            >
+            <span>₹190</span>
+            <button
+              class="product-cart-btn"
+              data-product-id="5013"
+              data-product-name="Red Velvet Cupcake"
+              data-product-price="190"
+              data-product-category="Baked Goods"
+              data-product-image="{{ url_for('static', filename='images/Baked Goods/RedVelvetCupcake.webp') }}"
+            >
+              <i class="fa-solid fa-cart-shopping"></i>Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- box13 -->
+        <div class="product-box">
+          <!-- img -->
+          <a
+            href="{{ url_for('product', product_id='5014') }}"
+            class="product-box-img"
+          >
+            <img
+              src="{{ url_for('static', filename='images/Baked Goods/HIGHRESCheeseCrackers-Square.jpg') }}"
+              alt="Baked Goods"
+            />
+            <div class="wishlist-btn" data-product-id="5014">
+              <i class="fa-regular fa-heart"></i>
+            </div>
+          </a>
+          <!-- text -->
+          <div class="product-box-text">
+            <a
+              href="{{ url_for('product', product_id='5014') }}"
+              class="product-text-title"
+              >Cheese Crackers</a
+            >
+            <span>₹190</span>
+            <button
+              class="product-cart-btn"
+              data-product-id="5014"
+              data-product-name="Cheese Crackers"
+              data-product-price="190"
+              data-product-category="Baked Goods"
+              data-product-image="{{ url_for('static', filename='images/Baked Goods/HIGHRESCheeseCrackers-Square.jpg') }}"
+            >
+              <i class="fa-solid fa-cart-shopping"></i>Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- box14 -->
+        <div class="product-box">
+          <!-- img -->
+          <a
+            href="{{ url_for('product', product_id='5015') }}"
+            class="product-box-img"
+          >
+            <img
+              src="{{ url_for('static', filename='images/Baked Goods/RedVelvetPastry_1.webp') }}"
+              alt="Baked Goods"
+            />
+            <div class="wishlist-btn" data-product-id="5015">
+              <i class="fa-regular fa-heart"></i>
+            </div>
+          </a>
+          <!-- text -->
+          <div class="product-box-text">
+            <a
+              href="{{ url_for('product', product_id='5015') }}"
+              class="product-text-title"
+              >Red Velvet Pastry</a
+            >
+            <span>₹159</span>
+            <button
+              class="product-cart-btn"
+              data-product-id="5015"
+              data-product-name="Red Velvet Pastry"
+              data-product-price="159"
+              data-product-category="Baked Goods"
+              data-product-image="{{ url_for('static', filename='images/Baked Goods/RedVelvetPastry_1.webp') }}"
+            >
+              <i class="fa-solid fa-cart-shopping"></i>Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- box15 -->
+        <div class="product-box">
+          <!-- img -->
+          <a
+            href="{{ url_for('product', product_id='5016') }}"
+            class="product-box-img"
+          >
+            <img
+              src="{{ url_for('static', filename='images/Baked Goods/StrawberryJam_ButterCookies.webp') }}"
+              alt="Baked Goods"
+            />
+            <div class="wishlist-btn" data-product-id="5016">
+              <i class="fa-regular fa-heart"></i>
+            </div>
+          </a>
+          <!-- text -->
+          <div class="product-box-text">
+            <a
+              href="{{ url_for('product', product_id='5016') }}"
+              class="product-text-title"
+              >Strawberry Jam Butter Cookies</a
+            >
+            <span>₹190</span>
+            <button
+              class="product-cart-btn"
+              data-product-id="5016"
+              data-product-name="Strawberry Jam Butter Cookies"
+              data-product-price="190"
+              data-product-category="Baked Goods"
+              data-product-image="{{ url_for('static', filename='images/Baked Goods/StrawberryJam_ButterCookies.webp') }}"
+            >
+              <i class="fa-solid fa-cart-shopping"></i>Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <!-- box16 -->
+        <div class="product-box">
+          <!-- img -->
+          <a
+            href="{{ url_for('product', product_id='501') }}"
+            class="product-box-img"
+          >
+            <img
+              src="{{ url_for('static', filename='images/Baked Goods/AssortedBrownieBox of 6.jpg') }}"
+              alt="Baked Goods"
+            />
+            <div class="wishlist-btn" data-product-id="501">
+              <i class="fa-regular fa-heart"></i>
+            </div>
+          </a>
+          <!-- text -->
+          <div class="product-box-text">
+            <a
+              href="{{ url_for('product', product_id='501') }}"
+              class="product-text-title"
+              >Assorted Brownie Box of 6</a
+            >
+            <span>₹199</span>
+            <button
+              class="product-cart-btn"
+              data-product-id="501"
+              data-product-name="Assorted Brownie Box of 6"
+              data-product-price="199"
+              data-product-category="Baked Goods"
+              data-product-image="{{ url_for('static', filename='images/Baked Goods/AssortedBrownieBox of 6.jpg') }}"
+            >
+              <i class="fa-solid fa-cart-shopping"></i>Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Service Box -->
+    <section class="services">
+      <div class="service-box">
+        <i class="fa-solid fa-truck-fast"></i>
+        <span>Free Shipping</span>
+        <p>Free shipping for all orders</p>
+      </div>
+
+      <div class="service-box">
+        <i class="fa-solid fa-headphones"></i>
+        <span>Support 24/7</span>
+        <p>We Support 24H a day</p>
+      </div>
+
+      <div class="service-box">
+        <i class="fa-solid fa-rotate"></i>
+        <span>100% Money Back</span>
+        <p>You have 30 days to return</p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-container">
+        <div class="footer-company-box">
+          <a href="{{ url_for('index') }}" class="footer-logo">
+            <img
+              src="{{ url_for('static', filename='images/LOGO.png') }}"
+              alt="logo"
+            />
+          </a>
+          <p>
+            SmarKet is a unique online platform dedicated to celebrating student
+            creativity.
+          </p>
+          <div class="footer-social">
+            <a href="#">
+              <i class="fa-brands fa-facebook"></i>
+            </a>
+            <a href="#">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-link-box">
+          <strong>Main Links</strong>
+          <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('index') }}#category">Categories</a></li>
+            <li><a href="{{ url_for('index') }}#shopping-banner">Shop</a></li>
+            <li><a href="{{ url_for('index') }}#popular">Popular</a></li>
+            <li><a href="{{ url_for('index') }}#recent-products">Recent</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-subscribe">
+          <strong>Subscribe Now</strong>
+          <p>Fresh products, straight to your inbox.</p>
+          <form class="subscribe-box">
+            <input type="email" placeholder="Email" name="subscribe" required />
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>MADE BY SMARKET</span>
+        <span>&copy; COPYRIGHT 2025 - SMARKET</span>
+      </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/password-toggle.js') }}"></script>
+  </body>
+</html>

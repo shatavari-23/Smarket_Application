@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Submit Feedback - SmarKet</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/dropdown.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/my-orders.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/feedback.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- You can include your standard header here if you want -->
+
+    <main class="feedback-container">
+      <h1>Share Your Experience</h1>
+      <p class="intro-text">
+        Your feedback helps us improve SmarKet for everyone.
+      </p>
+      <form id="feedback-form" class="feedback-form">
+        <div class="form-group">
+          <label>How would you rate your overall experience?</label>
+          <div class="rating">
+            <i class="fa-regular fa-star star" data-value="5"></i>
+            <i class="fa-regular fa-star star" data-value="4"></i>
+            <i class="fa-regular fa-star star" data-value="3"></i>
+            <i class="fa-regular fa-star star" data-value="2"></i>
+            <i class="fa-regular fa-star star" data-value="1"></i>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="feedback-text"
+            >Please share your comments or suggestions:</label
+          >
+          <textarea
+            id="feedback-text"
+            placeholder="Tell us what you think..."
+            required
+          ></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Submit Feedback</button>
+      </form>
+    </main>
+
+    {% if user_feedbacks %}
+    <section class="feedback-history-container">
+      <h2>Your Feedback History</h2>
+      <div class="order-list">
+        {% for feedback in user_feedbacks %}
+        <div class="order-card">
+          <div class="order-header">
+            <h3>Feedback from {{ feedback.timestamp.strftime('%d %B %Y') }}</h3>
+            <div class="rating-display">
+              {% for i in range(1, 6) %}
+              <i
+                class="fas fa-star"
+                class="fas fa-star {% if i <= feedback.rating %}star-filled{% else %}star-empty{% endif %}"
+              ></i>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="order-details">
+            <p><strong>Your Feedback:</strong></p>
+            <p class="pre-wrap-text">{{ feedback.feedback_text }}</p>
+          </div>
+          {% if feedback.admin_reply %}
+          <div class="admin-reply">
+            <p>
+              <strong
+                >Admin Reply ({{ feedback.replied_at.strftime('%d %B %Y')
+                }}):</strong
+              >
+            </p>
+            <p class="pre-wrap-text">{{ feedback.admin_reply }}</p>
+          </div>
+          {% else %}
+          <div class="admin-reply no-reply">
+            <p><i>An admin has not replied to this feedback yet.</i></p>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/feedback.js') }}"></script>
+  </body>
+</html>

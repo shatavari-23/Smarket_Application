@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/invoice.css') }}"
+    />
+  </head>
+  <body>
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    <div class="flash-message {{ category }}">
+      {{ message }}
+      <button onclick="this.parentElement.style.display='none';">
+        &times;
+      </button>
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
+
+    <div class="invoice-box">
+      <table cellpadding="0" cellspacing="0">
+        <tr class="top">
+          <td colspan="2">
+            <table>
+              <tr>
+                <td class="title">
+                  <img
+                    src="{{ url_for('static', filename='images/LOGO.png') }}"
+                    class="logo-img"
+                    title="SmarKet Logo"
+                  />
+                </td>
+                <td>
+                  Invoice #: {{ order.id }}<br />
+                  Created: {{ order.order_date.strftime('%Y-%m-%d') }}<br />
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr class="information">
+          <td colspan="2">
+            <table>
+              <tr>
+                <td>
+                  SmarKet<br />
+                  123 Pune<br />
+                  Pune, 411001
+                </td>
+                <td>
+                  {{ current_user.name }}<br />
+                  {{ current_user.email }}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr class="heading">
+          <td>Payment Method</td>
+          <td>UPI</td>
+        </tr>
+        <tr class="details">
+          <td>UPI ID</td>
+          <td>{{ order.payment_details or 'Not Applicable' }}</td>
+        </tr>
+        <tr class="heading">
+          <td>Item</td>
+          <td>Price</td>
+        </tr>
+        {% for item in order.items %}
+        <tr class="item">
+          <td>{{ item.product.name }} (x{{ item.quantity }})</td>
+          <td>₹{{ item.price }}</td>
+        </tr>
+        {% endfor %}
+        <tr class="total">
+          <td>Shipping Address:</td>
+          <td>{{ order.shipping_address }}</td>
+        </tr>
+        <tr class="total">
+          <td></td>
+          <td>Total: ₹{{ order.total_price }}</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

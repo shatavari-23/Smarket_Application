@@ -1,0 +1,2 @@
+- [x] Modify the chat_page route in app.py to pass current_user to the template
+- [x] Test the chat page to ensure no error

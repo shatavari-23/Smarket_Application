@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search Results for "{{ query }}" - SmarKet</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/dropdown.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/search-results.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/password-toggle.css') }}"
+    />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='images/LOGO.png') }}"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <section id="main1">
+      <!-- Header -->
+      <header>
+        <div class="header-top">
+          <label for="menu-btn" class="menu-icon">
+            <span class="nav-icon"></span>
+          </label>
+          <div class="nav-location">
+            <a href="#"
+              ><i class="fa-solid fa-location-dot"></i>PUNE, MAHARASTRA</a
+            >
+          </div>
+          <a href="{{ url_for('index') }}" class="logo">
+            <img
+              src="{{ url_for('static', filename='images/LOGO.png') }}"
+              alt="logo"
+            />
+          </a>
+          <div class="nav-btn">
+            <a href="javascript:void(0);" class="nav-search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </a>
+            {% if current_user.is_authenticated %}
+            <ul class="nav-user-list">
+              <li class="nav-user logged-in">
+                <span class="user-greeting"
+                  >Hi, {{ current_user.name.split(' ')[0] }}<span
+                    class="arrow-down"
+                  ></span
+                ></span>
+                <div class="user-dropdown">
+                  {% if current_user.role == 'admin' %}
+                  <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                  {% elif current_user.role == 'seller' %}
+                  <a href="{{ url_for('seller_dashboard') }}">Dashboard</a>
+                  {% endif %}
+                  <a href="{{ url_for('profile') }}">Profile</a>
+                  <a href="{{ url_for('feedback') }}">Feedback</a>
+                  <a href="{{ url_for('my_orders') }}">My Orders</a>
+                  <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+              </li>
+            </ul>
+            {% else %}
+            <a href="javascript:void(0);" class="nav-user"
+              ><i class="fa-solid fa-user"></i
+            ></a>
+            {% endif %}
+            <a
+              href="{{ url_for('notifications') }}"
+              class="nav-notification"
+              id="notification-btn"
+            >
+              <i class="fa-solid fa-bell"></i>
+              <span id="notification-count" class="notification-badge">0</span>
+            </a>
+            <a href="{{ url_for('wishlist') }}" class="nav-wishlist">
+              <i class="fa-solid fa-heart"></i>
+              <span id="wishlist-count" class="notification-badge">0</span>
+            </a>
+            <a href="{{ url_for('cart') }}" class="nav-cart">
+              <i class="fa-solid fa-bag-shopping"></i>
+              <span id="cart-count" class="notification-badge">0</span>
+            </a>
+          </div>
+        </div>
+        <nav class="navigation">
+          <ul class="menu">
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('index') }}#category">Category</a></li>
+            <li><a href="{{ url_for('index') }}#shopping-banner">Shop</a></li>
+            <li>
+              <a href="{{ url_for('index') }}#popular">Popular</a
+              ><span class="nav-label">Hot Offer</span>
+            </li>
+            <li><a href="{{ url_for('index') }}#recent-products">Recent</a></li>
+          </ul>
+        </nav>
+      </header>
+    </section>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <form class="search-input" action="{{ url_for('search') }}" method="GET">
+        <input
+          type="text"
+          name="q"
+          placeholder="Search For Product"
+          value="{{ query }}"
+        />
+        <a href="javascript:void(0);" class="search-cancel"
+          ><i class="fa-solid fa-xmark"></i
+        ></a>
+      </form>
+    </div>
+
+    <!-- Search Results Section -->
+    <section id="recent-products">
+      <div class="section-title">
+        <h2>Search Results for "{{ query }}"</h2>
+      </div>
+      <div class="recent-product-container">
+        {% if products %} {% for product in products %}
+        <div class="product-box">
+          <a
+            href="{{ url_for('product', product_id=product.id) }}"
+            class="product-box-img"
+          >
+            <img
+              src="{{ url_for('static', filename=product.image) }}"
+              alt="{{ product.name }}"
+            />
+            <div class="wishlist-btn" data-product-id="{{ product.id }}">
+              <i class="fa-regular fa-heart"></i>
+            </div>
+          </a>
+          <div class="product-box-text">
+            <a
+              href="{{ url_for('product', product_id=product.id) }}"
+              class="product-text-title"
+              >{{ product.name }}</a
+            >
+            <span>₹{{ product.price }}</span>
+            <button
+              class="product-cart-btn"
+              data-product-id="{{ product.id }}"
+              data-product-name="{{ product.name }}"
+              data-product-price="{{ product.price }}"
+              data-product-category="{{ product.category }}"
+              data-product-image="{{ product.image }}"
+            >
+              <i class="fa-solid fa-cart-shopping"></i>Add to Cart
+            </button>
+          </div>
+        </div>
+        {% endfor %} {% else %}
+        <p class="no-results-message">
+          No products found matching your search.
+        </p>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-container">
+        <div class="footer-company-box">
+          <a href="{{ url_for('index') }}" class="footer-logo">
+            <img
+              src="{{ url_for('static', filename='images/LOGO.png') }}"
+              alt="logo"
+            />
+          </a>
+          <p>
+            SmarKet is a unique online platform dedicated to celebrating student
+            creativity.
+          </p>
+          <div class="footer-social">
+            <a href="#">
+              <i class="fa-brands fa-facebook"></i>
+            </a>
+            <a href="#">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-link-box">
+          <strong>Main Links</strong>
+          <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="#category">Categories</a></li>
+            <li><a href="#shopping-banner">Shop</a></li>
+            <li><a href="#popular">Popular</a></li>
+            <li><a href="#recent-products">Recent</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-subscribe">
+          <strong>Subscribe Now</strong>
+          <p>Fresh products, straight to your inbox.</p>
+          <form class="subscribe-box">
+            <input type="email" placeholder="Email" name="subscribe" required />
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>MADE BY SMARKET</span>
+        <span>&copy; COPYRIGHT 2025 - SMARKET</span>
+      </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/password-toggle.js') }}"></script>
+  </body>
+</html>

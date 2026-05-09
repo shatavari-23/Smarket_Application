@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Orders - Smarket</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/dropdown.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/my-orders.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <section id="main1">
+      <input
+        type="checkbox"
+        class="menu-btn"
+        id="menu-btn"
+        aria-label="menu-btn"
+      />
+
+      <!-- Header Icons -->
+      <header>
+        <div class="header-top">
+          <label for="menu-btn" class="menu-icon">
+            <span class="nav-icon"></span>
+          </label>
+
+          <div class="nav-location">
+            <a href="#"
+              ><i class="fa-solid fa-location-dot"></i>PUNE, MAHARASTRA</a
+            >
+          </div>
+
+          <a href="{{ url_for('index') }}" class="logo">
+            <img
+              src="{{ url_for('static', filename='images/LOGO.png') }}"
+              alt="logo"
+            />
+          </a>
+
+          <div class="nav-btn">
+            <a href="javascript:void(0);" class="nav-search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </a>
+            {% if current_user.is_authenticated %}
+            <ul class="nav-user-list">
+              <li class="nav-user logged-in">
+                <span class="user-greeting"
+                  >Hi, {{ current_user.name.split(' ')[0] }}<span
+                    class="arrow-down"
+                  ></span
+                ></span>
+                <div class="user-dropdown">
+                  {% if current_user.role == 'admin' %}
+                  <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                  {% elif current_user.role == 'seller' %}
+                  <a href="{{ url_for('seller_dashboard') }}">Dashboard</a>
+                  {% endif %}
+                  <a href="{{ url_for('profile') }}">Profile</a>
+                  <a href="{{ url_for('feedback') }}">Feedback</a>
+                  <a href="{{ url_for('my_orders') }}">My Orders</a>
+                  <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+              </li>
+            </ul>
+            {% else %}
+            <a href="javascript:void(0);" class="nav-user"
+              ><i class="fa-solid fa-user"></i>
+            </a>
+            {% endif %}
+            <a
+              href="{{ url_for('notifications') }}"
+              class="nav-notification"
+              id="notification-btn"
+            >
+              <i class="fa-solid fa-bell"></i>
+              <span id="notification-count" class="notification-badge">0</span>
+            </a>
+            <a href="{{ url_for('wishlist') }}" class="nav-wishlist">
+              <i class="fa-solid fa-heart"></i>
+              <span id="wishlist-count" class="notification-badge">0</span>
+            </a>
+            <a href="{{ url_for('cart') }}" class="nav-cart"
+              ><i class="fa-solid fa-bag-shopping"></i>
+              <span id="cart-count" class="notification-badge">0</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="navigation">
+          <ul class="menu">
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('index') }}#category">Category</a></li>
+            <li><a href="{{ url_for('index') }}#shopping-banner">Shop</a></li>
+            <li>
+              <a href="{{ url_for('index') }}#popular">Popular</a>
+              <span class="nav-label">Hot Offer</span>
+            </li>
+            <li><a href="{{ url_for('index') }}#recent-products">Recent</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div class="flash-message {{ category }}">
+        {{ message }}
+        <button onclick="this.parentElement.style.display='none';">
+          &times;
+        </button>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
+    </section>
+
+    <main class="orders-container">
+      <h1>My Orders</h1>
+      <div class="order-list">
+        {% if orders %} {% for order in orders %}
+        <div class="order-card">
+          <div class="order-header">
+            <h3>Order #{{ order.id }}</h3>
+            <div class="order-header-right">
+              <span class="order-status {{ order.status.lower() }}"
+                >{{ order.status }}</span
+              >
+              <span class="order-total"
+                ><strong>Total:</strong> ₹{{ order.total_price }}</span
+              >
+            </div>
+          </div>
+          <div class="order-details">
+            <p>
+              <strong>Order Date:</strong> {{ order.order_date.strftime('%d %B
+              %Y') }}
+            </p>
+            <p>
+              <strong>Estimated Delivery:</strong> {{
+              order.estimated_delivery_date.strftime('%d %B %Y') if
+              order.estimated_delivery_date else 'N/A' }}
+            </p>
+            {% if order.tracking_number %}
+            <p><strong>Tracking Number:</strong> {{ order.tracking_number }}</p>
+            {% endif %}
+            <p>
+              <strong>Payment Method:</strong> {{ order.payment_method.upper()
+              }}
+            </p>
+          </div>
+
+          <!-- Order Tracking Timeline -->
+          <div class="order-tracking">
+            <div
+              class="tracking-step {% if order.status in ['Processing', 'Shipped', 'Delivered'] %}completed{% endif %}"
+            >
+              <div class="step-icon"><i class="fas fa-cogs"></i></div>
+              <p>Processing</p>
+            </div>
+            <div class="tracking-line"></div>
+            <div
+              class="tracking-step {% if order.status in ['Shipped', 'Delivered'] %}completed{% endif %}"
+            >
+              <div class="step-icon"><i class="fas fa-truck"></i></div>
+              <p>Shipped</p>
+            </div>
+            <div class="tracking-line"></div>
+            <div
+              class="tracking-step {% if order.status == 'Delivered' %}completed{% endif %}"
+            >
+              <div class="step-icon">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <p>Delivered</p>
+            </div>
+          </div>
+          <div class="order-items">
+            <h4>Items:</h4>
+            {% for item in order.items %}
+            <div class="order-item">
+              <img
+                src="{{ url_for('static', filename=item.product.image) }}"
+                alt="{{ item.product.name }}"
+              />
+              <div class="item-info">
+                <h4>{{ item.product.name }}</h4>
+                <p>Quantity: {{ item.quantity }}</p>
+                <p>Price: ₹{{ item.price }}</p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+          <div class="order-actions">
+            {% if order.status != 'Cancelled' %}
+            <button
+              class="btn btn-cancel"
+              data-order-id="{{ order.id }}"
+              {%
+              if
+              order.status
+              !="Processing"
+              %}
+              disabled
+              title="Orders can only be cancelled while in 'Processing' status."
+              {%
+              endif
+              %}
+            >
+              Cancel Order
+            </button>
+            {% else %}
+            <!-- Optionally show something for cancelled orders, or nothing -->
+            {% endif %} {% if order.payment_method == 'upi' %}
+            <a href="{{ url_for('invoice', order_id=order.id) }}" class="btn"
+              >View Invoice</a
+            >
+            {% elif order.payment_method == 'cod' %}
+            <p class="cod-message">
+              Invoice will be generated upon successful payment.
+            </p>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %} {% else %}
+        <p>You have no orders yet.</p>
+        {% endif %}
+      </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("click", async function (event) {
+          if (event.target.classList.contains("btn-cancel")) {
+            const orderId = event.target.dataset.orderId;
+            if (!orderId) return;
+
+            if (confirm("Are you sure you want to cancel this order?")) {
+              try {
+                const response = await fetch(`/api/order/cancel/${orderId}`, {
+                  method: "POST",
+                });
+                const result = await response.json();
+                alert(result.message);
+                if (response.ok) {
+                  // Reload the page to show the updated order status
+                  window.location.reload();
+                }
+              } catch (error) {
+                console.error("Error cancelling order:", error);
+                alert("An error occurred while trying to cancel the order.");
+              }
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

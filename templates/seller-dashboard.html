@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seller Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/dropdown.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/seller-dashboard.css') }}"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <section id="main1">
+      <input
+        type="checkbox"
+        class="menu-btn"
+        id="menu-btn"
+        aria-label="menu-btn"
+      />
+
+      <!-- Header Icons -->
+      <header>
+        <div class="header-top">
+          <label for="menu-btn" class="menu-icon">
+            <span class="nav-icon"></span>
+          </label>
+
+          <div class="nav-location">
+            <a href="#"
+              ><i class="fa-solid fa-location-dot"></i>PUNE, MAHARASTRA</a
+            >
+          </div>
+
+          <a href="{{ url_for('index') }}" class="logo">
+            <img
+              src="{{ url_for('static', filename='images/LOGO.png') }}"
+              alt="logo"
+            />
+          </a>
+
+          <div class="nav-btn">
+            <a href="javascript:void(0);" class="nav-search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </a>
+            {% if current_user.is_authenticated %}
+            <ul class="nav-user-list">
+              <li class="nav-user logged-in">
+                <span class="user-greeting"
+                  >Hi, {{ current_user.name.split(' ')[0] }}<span
+                    class="arrow-down"
+                  ></span
+                ></span>
+                <div class="user-dropdown">
+                  {% if current_user.role == 'admin' %}
+                  <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                  {% elif current_user.role == 'seller' %}
+                  <a href="{{ url_for('seller_dashboard') }}">Dashboard</a>
+                  {% endif %}
+                  <a href="{{ url_for('profile') }}">Profile</a>
+                  {% if current_user.role == 'buyer' %}
+                  <a href="{{ url_for('feedback') }}">Feedback</a>
+                  <a href="{{ url_for('my_orders') }}">My Orders</a>
+                  {% endif %}
+                  <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+              </li>
+            </ul>
+            {% else %}
+            <a href="javascript:void(0);" class="nav-user"
+              ><i class="fa-solid fa-user"></i>
+            </a>
+            {% endif %}
+            <a
+              href="{{ url_for('notifications') }}"
+              class="nav-notification"
+              id="notification-btn"
+            >
+              <i class="fa-solid fa-bell"></i>
+              <span id="notification-count" class="notification-badge">0</span>
+            </a>
+            <a href="{{ url_for('wishlist') }}" class="nav-wishlist">
+              <i class="fa-solid fa-heart"></i>
+              <span id="wishlist-count" class="notification-badge">0</span>
+            </a>
+            <a href="{{ url_for('cart') }}" class="nav-cart"
+              ><i class="fa-solid fa-bag-shopping"></i>
+              <span id="cart-count" class="notification-badge">0</span>
+            </a>
+          </div>
+        </div>
+      </header>
+
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div class="flash-message {{ category }}">
+        {{ message }}
+        <button onclick="this.parentElement.style.display='none';">
+          &times;
+        </button>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
+    </section>
+
+    <div class="dashboard-container">
+      <aside class="sidebar">
+        <h2>Seller Dashboard</h2>
+        <nav>
+          <ul>
+            <li><a href="#upload-product">Upload Product</a></li>
+            <li><a href="#my-products">My Products</a></li>
+            <li><a href="#seller-orders">My Orders</a></li>
+            <li><a href="#seller-revenue">Revenue Overview</a></li>
+            <li><a href="{{ url_for('index') }}">Go to Buyer View</a></li>
+          </ul>
+        </nav>
+      </aside>
+      <main class="main-content2">
+        <section id="upload-product">
+          <h3>Upload New Product</h3>
+          <form
+            id="product-upload-form"
+            class="upload-form"
+            enctype="multipart/form-data"
+          >
+            <input type="hidden" id="product-id" name="product_id" />
+            <div class="form-group">
+              <label for="product-name">Product Name:</label>
+              <input type="text" id="product-name" name="name" required />
+            </div>
+            <div class="form-group">
+              <label for="product-price">Price:</label>
+              <input
+                type="number"
+                id="product-price"
+                name="price"
+                step="0.01"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="product-category">Category:</label>
+              <select id="product-category" name="category" required>
+                <option value="" disabled selected>Select Category</option>
+                <option value="jewellery">Jewellery</option>
+                <option value="clothes">Clothes</option>
+                <option value="baked-goods">Baked Goods</option>
+                <option value="paintings">Paintings</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="product-description">Description:</label>
+              <textarea
+                id="product-description"
+                name="description"
+                rows="4"
+                required
+              ></textarea>
+            </div>
+            <div class="form-group">
+              <label for="product-stock">Stock:</label>
+              <input
+                type="number"
+                id="product-stock"
+                name="stock"
+                value="0"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="product-image">Product Image:</label>
+              <input
+                type="file"
+                id="product-image"
+                name="image"
+                accept="image/*"
+                required
+              />
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn" id="upload-btn">
+                Upload Product
+              </button>
+              <button type="button" class="btn btn-cancel" id="cancel-edit-btn">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </section>
+        <section id="my-products">
+          <h3>My Products</h3>
+          <div id="product-list" class="product-list-grid"></div>
+        </section>
+        <section id="seller-orders">
+          <h3>My Orders</h3>
+          <div id="orders-list" class="order-list"></div>
+        </section>
+        <section id="seller-revenue" class="dashboard-section">
+          <h3>Revenue Overview</h3>
+          <div class="overview-container">
+            <div class="overview-card">
+              <h4>Total Revenue</h4>
+              <p id="seller-total-revenue">₹0.00</p>
+            </div>
+          </div>
+          <div class="reports-container">
+            <div class="report-card full-width">
+              <h3>Revenue (Last 6 months)</h3>
+              <div class="chart-container">
+                <canvas id="seller-revenue-chart"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dashboard_scripts.js') }}"></script>
+    <script>
+      // Fetch seller revenue and render chart
+      document.addEventListener("DOMContentLoaded", function () {
+        const totalEl = document.getElementById("seller-total-revenue");
+        const ctx = document
+          .getElementById("seller-revenue-chart")
+          .getContext("2d");
+        fetch("/api/seller/revenue")
+          .then((res) => res.json())
+          .then((data) => {
+            if (!data.success) return;
+            const total = data.total_revenue || 0;
+            // Format currency (simple)
+            totalEl.textContent =
+              "₹" +
+              total.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              });
+
+            const labels = data.monthly_labels || [];
+            const values = data.monthly_values || [];
+
+            new Chart(ctx, {
+              type: "line",
+              data: {
+                labels: labels,
+                datasets: [
+                  {
+                    label: "Revenue",
+                    data: values,
+                    backgroundColor: "rgba(54, 162, 235, 0.2)",
+                    borderColor: "rgba(54, 162, 235, 1)",
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    ticks: {
+                      callback: function (v) {
+                        return "₹" + v;
+                      },
+                    },
+                  },
+                },
+              },
+            });
+          })
+          .catch((err) => console.error("Failed to load seller revenue", err));
+      });
+    </script>
+  </body>
+</html>

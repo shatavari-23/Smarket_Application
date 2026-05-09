@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/dropdown.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin-dashboard.css') }}"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="header-container">
+      <input
+        type="checkbox"
+        class="menu-btn"
+        id="menu-btn"
+        aria-label="menu-btn"
+      />
+
+      <!-- Header Icons -->
+      <header>
+        <div class="header-top">
+          <label for="menu-btn" class="menu-icon">
+            <span class="nav-icon"></span>
+          </label>
+
+          <div class="nav-location">
+            <a
+              href="#"
+              title="Change Location"
+              aria-label="Current location: PUNE, MAHARASTRA"
+              ><i class="fa-solid fa-location-dot"></i>PUNE, MAHARASTRA</a
+            >
+          </div>
+
+          <a href="{{ url_for('index') }}" class="logo">
+            <img
+              src="{{ url_for('static', filename='images/LOGO.png') }}"
+              alt="logo"
+            />
+          </a>
+
+          <div class="nav-btn">
+            <a
+              href="javascript:void(0);"
+              class="nav-search"
+              aria-label="Search"
+            >
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </a>
+            {% if current_user.is_authenticated %}
+            <ul class="nav-user-list">
+              <li class="nav-user logged-in">
+                <span class="user-greeting"
+                  >Hi, {{ current_user.name.split(' ')[0] }}<span
+                    class="arrow-down"
+                  ></span
+                ></span>
+                <div class="user-dropdown">
+                  {% if current_user.role == 'admin' %}
+                  <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                  {% elif current_user.role == 'seller' %}
+                  <a href="{{ url_for('seller_dashboard') }}">Dashboard</a>
+                  {% endif %}
+                  <a href="{{ url_for('profile') }}">Profile</a>
+                  {% if current_user.role == 'buyer' %}
+                  <a href="{{ url_for('feedback') }}">Feedback</a>
+                  <a href="{{ url_for('my_orders') }}">My Orders</a>
+                  {% endif %}
+                  <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+              </li>
+            </ul>
+            {% else %}
+            <a
+              href="javascript:void(0);"
+              class="nav-user"
+              aria-label="Login or Sign up"
+              ><i class="fa-solid fa-user"></i>
+            </a>
+            {% endif %}
+            <a
+              href="{{ url_for('notifications') }}"
+              class="nav-notification"
+              id="notification-btn"
+              aria-label="Notifications"
+            >
+              <i class="fa-solid fa-bell"></i>
+              <span id="notification-count" class="notification-badge">0</span>
+            </a>
+            <a
+              href="{{ url_for('wishlist') }}"
+              class="nav-wishlist"
+              aria-label="Wishlist"
+            >
+              <i class="fa-solid fa-heart"></i>
+              <span id="wishlist-count" class="notification-badge">0</span>
+            </a>
+            <a href="{{ url_for('cart') }}" class="nav-cart" aria-label="Cart"
+              ><i class="fa-solid fa-bag-shopping"></i>
+              <span id="cart-count" class="notification-badge">0</span>
+            </a>
+          </div>
+        </div>
+      </header>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    <div class="flash-message {{ category }}">
+      {{ message }}
+      <button onclick="this.parentElement.style.display='none';">
+        &times;
+      </button>
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
+
+    <div class="dashboard-container">
+      <aside class="sidebar">
+        <h2>Admin Dashboard</h2>
+        <nav>
+          <ul>
+            <li><a href="#manage-buyers">Manage Buyers</a></li>
+            <li><a href="#manage-sellers">Manage Sellers</a></li>
+            <li><a href="#pending-products">Pending Products</a></li>
+            <li><a href="#manage-products">Manage All Products</a></li>
+            <li><a href="#admin-reports">Sales Reports</a></li>
+            <li><a href="#manage-feedback">User Feedback</a></li>
+            <li><a href="{{ url_for('index') }}">Go to Buyer View</a></li>
+          </ul>
+        </nav>
+      </aside>
+      <main class="main-content2">
+        <section id="manage-buyers">
+          <h3>Manage Buyers</h3>
+          <table id="buyer-table">
+            <thead>
+              <tr>
+                <th>Buyer ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </section>
+        <section id="manage-sellers">
+          <h3>Manage Sellers</h3>
+          <table id="seller-table">
+            <thead>
+              <tr>
+                <th>Seller ID</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </section>
+        <section id="pending-products">
+          <h3>Pending Products</h3>
+          <table id="pending-products-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Seller ID</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </section>
+        <section id="manage-products">
+          <h3>Manage All Products</h3>
+          <table id="all-products-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Seller ID</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </section>
+        <section id="admin-reports" class="dashboard-section">
+          <h2>Sales & Performance Reports</h2>
+          <!-- Overview Metrics -->
+          <div class="overview-container">
+            <div class="overview-card">
+              <h4>Total Sales</h4>
+              <p id="metric-total-sales">₹0.00</p>
+            </div>
+            <div class="overview-card">
+              <h4>Total Orders</h4>
+              <p id="metric-total-orders">0</p>
+            </div>
+            <div class="overview-card">
+              <h4>Avg. Order Value</h4>
+              <p id="metric-avg-order-value">₹0.00</p>
+            </div>
+            <div class="overview-card">
+              <h4>Active Listings</h4>
+              <p id="metric-active-listings">0</p>
+            </div>
+            <div class="overview-card">
+              <h4>Total Sellers</h4>
+              <p id="metric-total-sellers">0</p>
+            </div>
+            <div class="overview-card">
+              <h4>Total Buyers</h4>
+              <p id="metric-total-buyers">0</p>
+            </div>
+          </div>
+
+          <!-- New Reports Section -->
+          <div class="reports-container">
+            <div class="report-card">
+              <h3>Monthly Sales</h3>
+              <div class="chart-container">
+                <canvas id="monthly-sales-chart"></canvas>
+              </div>
+            </div>
+            <div class="report-card">
+              <h3>Product Performance (Units Sold)</h3>
+              <div class="chart-container">
+                <canvas id="product-performance-chart"></canvas>
+              </div>
+            </div>
+            <div class="report-card full-width">
+              <h3>Daily Sales</h3>
+              <div class="report-filters">
+                <label for="daily-sales-start">Start Date:</label>
+                <input type="date" id="daily-sales-start" />
+                <label for="daily-sales-end">End Date:</label>
+                <input type="date" id="daily-sales-end" />
+                <button id="filter-daily-sales-btn" class="action-btn">
+                  Filter
+                </button>
+              </div>
+              <div class="chart-container">
+                <canvas id="daily-sales-chart"></canvas>
+              </div>
+            </div>
+            <div class="report-card">
+              <h3>Peak Purchasing Hours</h3>
+              <div class="chart-container">
+                <canvas id="peak-hours-chart"></canvas>
+              </div>
+            </div>
+            <div class="report-card">
+              <h3>Top Seller Performance (by Rating)</h3>
+              <div class="chart-container">
+                <canvas id="seller-performance-chart"></canvas>
+              </div>
+            </div>
+            <div class="report-card full-width">
+              <h3>Platform Growth (New Users per Month)</h3>
+              <div class="chart-container">
+                <canvas id="platform-growth-chart"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="payment-report" class="dashboard-section">
+          <h3>Detailed Payment Report</h3>
+          <table id="payment-report-table">
+            <thead>
+              <tr>
+                <th>Payment ID</th>
+                <th>Order ID</th>
+                <th>User</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Data will be populated by JavaScript -->
+            </tbody>
+          </table>
+        </section>
+        <section id="manage-feedback" class="dashboard-section">
+          <h3>User Feedback</h3>
+          <div class="table-container">
+            <table id="feedback-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Role</th>
+                  <th>Rating</th>
+                  <th>Feedback</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Feedback data will be populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Feedback Reply Modal -->
+    <div id="feedback-reply-modal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h3>Reply to Feedback</h3>
+        <div class="feedback-context">
+          <strong>User:</strong> <span id="modal-user-name"></span><br />
+          <strong>Feedback:</strong>
+          <p id="modal-feedback-text"></p>
+        </div>
+        <form id="feedback-reply-form">
+          <input type="hidden" id="modal-feedback-id" />
+          <textarea
+            id="modal-reply-text"
+            placeholder="Write your reply here..."
+            required
+          ></textarea>
+          <button type="submit" class="action-btn approve">Send Reply</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='js/dashboard_scripts.js') }}"></script>
+  </body>
+</html>

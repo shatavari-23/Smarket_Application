@@ -1,0 +1,12 @@
+#recent-products .section-title {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+#recent-products .no-results-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #555;
+    font-size: 1.1rem;
+    padding: 3rem 0;
+}

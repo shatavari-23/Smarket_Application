@@ -1,0 +1,205 @@
+/* Product Details Section */
+.product-details {
+    display: flex; /* Use flexbox for layout */
+    justify-content: center;
+    align-items: flex-start; /* Align items to the top */
+    padding: 50px 20px;
+    gap: 50px;
+    max-width: 1200px;
+    margin: auto;
+    flex-wrap: wrap;
+    background-color: var(--product-bg-color);
+    border-radius: 30px;
+}
+
+.product-details .product-image {
+    flex: 1; /* Allows the image section to grow and shrink */
+    min-width: 300px;
+    max-width: 500px;
+    position: relative;
+}
+
+.product-details .product-image img {
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.product-details .product-info {
+    flex: 1; /* Allows the info section to grow and shrink */
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.product-info .product-name {
+    border-bottom: 2px solid var(--main-light);
+    padding-bottom: 10px;
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--main-dark);
+}
+
+.product-info .product-price {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--main-dark);
+}
+
+.product-info .product-description,
+.product-seller {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 15px;
+    padding-right: 5px;
+}
+
+/* Product Details Section - Button Group */
+.product-details .action-buttons {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.product-details .main-actions {
+    display: flex;
+    gap: 20px;
+    flex-basis: 100%;
+}
+
+.product-details .btn-add-to-cart,
+.product-details .btn-buy-now,
+.product-details .btn-chat-with-seller { /* This will be moved */
+    flex: 1;
+    min-width: 150px;
+    background-color: var(--main-dark);
+    color: #fff;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.product-seller span {
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-transform: uppercase;
+}
+
+.product-details .btn-buy-now {
+    border: 1px solid var(--main-dark);
+    background-color: transparent;
+    color: var(--main-dark);
+}
+
+.product-details .btn-buy-now:hover {
+    background-color: floralwhite ;
+    color: var(--main-dark);
+    transform: translateY(-2px);
+}
+
+.product-details .btn-add-to-cart:hover {
+    color: floralwhite;
+    transform: translateY(-2px);
+}
+
+
+
+/* Review/Rating Section */
+
+#reviews-section h3{
+    color: var(--main-dark);
+    padding-top: 30px;
+    border-bottom: 2px solid var(--main-light);
+}
+/* Rating stars */
+.rating {
+  display: flex;
+  gap: 5px;
+  margin: 10px 0;
+  cursor: pointer;
+  align-items: center;
+}
+
+.rating label {
+  margin-right: 10px;
+  font-weight: 500;
+}
+
+.rating .star {
+  font-size: 1.6rem;
+  color: #ccc; /* outline by default */
+  transition: color 0.3s;
+}
+
+.rating .fa-solid {
+  color: #f5c518; /* gold for selected */
+}
+
+
+.review-form .rating label{
+    color: var(--main-dark);
+}
+/* Review box */
+#review-text {
+  width: 100%;
+  height: 80px;
+  margin-bottom: 10px;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  resize: none;
+}
+
+.btn-submit-review {
+  background: var(--main-dark);
+  color: #fff;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-submit-review:hover {
+  background: #414a57;
+}
+
+/* Review list */
+#reviews-list {
+  margin-top: 20px;
+}
+
+.review-item {
+  background: #f9f9f9;
+  border: 1px solid #eee;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.review-item .stars i {
+  color: #f5c518;
+  margin-right: 2px;
+}
+
+.rating .fa-regular.fa-star {
+  color: #ccc; /* grey outline */
+}
+
+.rating .fa-solid.fa-star {
+  color: #f5c518; /* gold filled */
+}
+
+.review-item .fa-solid.fa-star {
+  color: #f5c518;
+}
+
+.review-item .fa-regular.fa-star {
+  color: #ccc;
+}

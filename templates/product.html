@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ product.name }} - SmarKet</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/dropdown.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/description.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/chat.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/password-toggle.css') }}"
+    />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='images/LOGO.png') }}"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
+    />
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  </head>
+  <body data-product-id="{{ product.id }}">
+    <section id="main1">
+      <input
+        type="checkbox"
+        class="menu-btn"
+        id="menu-btn"
+        aria-label="menu-btn"
+      />
+
+      <!-- Header Icons -->
+      <header>
+        <div class="header-top">
+          <label for="menu-btn" class="menu-icon">
+            <span class="nav-icon"></span>
+          </label>
+
+          <div class="nav-location">
+            <a
+              href="#"
+              title="Change Location"
+              aria-label="Current location: PUNE, MAHARASTRA"
+              ><i class="fa-solid fa-location-dot"></i>PUNE, MAHARASTRA</a
+            >
+          </div>
+
+          <a href="{{ url_for('index') }}" class="logo">
+            <img
+              src="{{ url_for('static', filename='images/LOGO.png') }}"
+              alt="logo"
+            />
+          </a>
+
+          <div class="nav-btn">
+            <a
+              href="javascript:void(0);"
+              class="nav-search"
+              aria-label="Search"
+            >
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </a>
+            {% if current_user.is_authenticated %}
+            <ul class="nav-user-list">
+              <li class="nav-user logged-in">
+                <span class="user-greeting"
+                  >Hi, {{ current_user.name.split(' ')[0] }}<span
+                    class="arrow-down"
+                  ></span
+                ></span>
+                <div class="user-dropdown">
+                  {% if current_user.role == 'admin' %}
+                  <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                  {% elif current_user.role == 'seller' %}
+                  <a href="{{ url_for('seller_dashboard') }}">Dashboard</a>
+                  {% endif %}
+                  <a href="{{ url_for('profile') }}">Profile</a>
+                  <a href="{{ url_for('feedback') }}">Feedback</a>
+                  <a href="{{ url_for('my_orders') }}">My Orders</a>
+                  <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+              </li>
+            </ul>
+            {% else %}
+            <a
+              href="javascript:void(0);"
+              class="nav-user"
+              aria-label="Login or Sign up"
+              ><i class="fa-solid fa-user"></i>
+            </a>
+            {% endif %}
+            <a
+              href="{{ url_for('notifications') }}"
+              class="nav-notification"
+              id="notification-btn"
+              aria-label="Notifications"
+            >
+              <i class="fa-solid fa-bell"></i>
+              <span id="notification-count" class="notification-badge">0</span>
+            </a>
+            <a
+              href="{{ url_for('wishlist') }}"
+              class="nav-wishlist"
+              aria-label="Wishlist"
+            >
+              <i class="fa-solid fa-heart"></i>
+              <span id="wishlist-count" class="notification-badge">0</span>
+            </a>
+            <a href="{{ url_for('cart') }}" class="nav-cart" aria-label="Cart"
+              ><i class="fa-solid fa-bag-shopping"></i>
+              <span id="cart-count" class="notification-badge">0</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="navigation">
+          <ul class="menu">
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('index') }}#category">Category</a></li>
+            <li><a href="{{ url_for('index') }}#shopping-banner">Shop</a></li>
+            <li>
+              <a href="{{ url_for('index') }}#popular">Popular</a>
+              <span class="nav-label">Hot Offer</span>
+            </li>
+            <li><a href="{{ url_for('index') }}#recent-products">Recent</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div class="flash-message {{ category }}">
+        {{ message }}
+        <button onclick="this.parentElement.style.display='none';">
+          &times;
+        </button>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
+    </section>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <form class="search-input">
+        <input type="text" name="search" placeholder="Search For Product" />
+        <a
+          href="javascript:void(0);"
+          class="search-cancel"
+          aria-label="Close search"
+          ><i class="fa-solid fa-xmark"></i>
+        </a>
+      </form>
+    </div>
+
+    <!-- Login/Register Form -->
+    <div class="form">
+      <div class="login-form">
+        <a
+          href="javascript:void(0);"
+          class="form-cancel"
+          aria-label="Close login form"
+          ><i class="fa-solid fa-xmark"></i>
+        </a>
+        <strong>Login</strong>
+        <div
+          id="g_id_onload"
+          data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+          data-context="signin"
+          data-ux_mode="popup"
+          data-login_uri="http://localhost:5000/login"
+          data-auto_select="true"
+          data-itp_support="true"
+          data-callback="handleCredentialResponse"
+          data-auto_prompt="false"
+        ></div>
+        <div
+          class="g_id_signin"
+          data-type="standard"
+          data-shape="pill"
+          data-theme="outline"
+          data-text="signin_with"
+          data-size="large"
+          data-logo_alignment="left"
+        ></div>
+        <form>
+          <input type="email" name="email" placeholder="Email" required />
+          <div class="password-wrapper">
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              required
+            />
+            <i class="fa-solid fa-eye toggle-password"></i>
+          </div>
+          <input type="submit" value="Login" />
+        </form>
+        <div class="form-btn">
+          <a href="#" class="forget">Forget Your Password?</a>
+          <a href="javascript:void(0);" class="sign-up-btn">Create Account</a>
+        </div>
+      </div>
+
+      <div class="signup-form">
+        <a
+          href="javascript:void(0);"
+          class="form-cancel"
+          aria-label="Close signup form"
+          ><i class="fa-solid fa-xmark"></i>
+        </a>
+        <strong>Sign Up</strong>
+        <form>
+          <input type="text" name="Fullname" placeholder="Full Name" required />
+          <input type="email" name="email" placeholder="Email" required />
+          <div class="password-wrapper">
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              required
+            />
+            <i class="fa-solid fa-eye toggle-password"></i>
+          </div>
+          <label for="signup-role" class="form-label">Role</label>
+          <select id="signup-role" name="role" required>
+            <option value="" disabled selected>Select Role</option>
+            <option value="admin">Admin</option>
+            <option value="seller">Seller</option>
+            <option value="buyer">Buyer</option>
+          </select>
+          <input type="submit" value="Sign Up" />
+        </form>
+        <div class="form-btn">
+          <a href="javascript:void(0);" class="already-account"
+            >Already Have an Account?
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <section class="product-details">
+      <div class="product-image">
+        <img
+          src="{{ url_for('static', filename=product.image) }}"
+          alt="{{ product.name }}"
+        />
+        <div class="wishlist-btn">
+          <i class="fa-regular fa-heart"></i>
+        </div>
+      </div>
+      <div class="product-info">
+        <h1 class="product-name">{{ product.name }}</h1>
+        <p class="product-seller">
+          Sold by: <span>{{ product.seller.name }}</span>
+        </p>
+        <p class="product-price">₹{{ product.price }}</p>
+
+        <p class="product-description">{{ product.description | safe }}</p>
+        <div class="action-buttons">
+          <div class="main-actions">
+            <button
+              class="product-cart-btn btn-add-to-cart"
+              data-product-id="{{ product.id }}"
+              data-product-name="{{ product.name }}"
+              data-product-price="{{ product.price }}"
+              data-product-image="{{ product.image }}"
+              data-product-category="{{ product.category }}"
+            >
+              Add to Cart
+            </button>
+            <button
+              class="btn-buy-now"
+              data-product-id="{{ product.id }}"
+              data-product-name="{{ product.name }}"
+              data-product-price="{{ product.price }}"
+              data-product-image="{{ product.image }}"
+              data-product-category="{{ product.category }}"
+            >
+              Buy Now
+            </button>
+          </div>
+          {% if current_user.is_authenticated and current_user.role == 'buyer'
+          and product.seller_id != current_user.id %}
+          <button
+            class="btn-chat-with-seller"
+            data-product-id="{{ product.id }}"
+            data-seller-id="{{ product.seller.id }}"
+          >
+            Chat with Seller
+          </button>
+          {% endif %}
+        </div>
+        <section id="reviews-section">
+          <h3>Customer Reviews</h3>
+
+          {% if current_user.is_authenticated and current_user.role == 'buyer'
+          %}
+          <form id="review-form" class="review-form">
+            <div class="rating">
+              <label>Your Rating:</label>
+              <i class="fa-regular fa-star star" data-value="1"></i>
+              <i class="fa-regular fa-star star" data-value="2"></i>
+              <i class="fa-regular fa-star star" data-value="3"></i>
+              <i class="fa-regular fa-star star" data-value="4"></i>
+              <i class="fa-regular fa-star star" data-value="5"></i>
+            </div>
+
+            <textarea
+              id="review-text"
+              placeholder="Write your review..."
+              required
+            ></textarea>
+            <button type="submit" class="btn-submit-review">
+              Submit Review
+            </button>
+          </form>
+          {% elif current_user.is_authenticated %}
+          <p>Only buyers can leave a review.</p>
+          {% else %}
+          <p>
+            <a href="#" class="nav-user">Log in</a> as a buyer to leave a
+            review.
+          </p>
+          {% endif %}
+
+          <div id="reviews-list">
+            <!-- Reviews will be loaded here by JavaScript -->
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-container">
+        <div class="footer-company-box">
+          <a href="{{ url_for('index') }}" class="footer-logo">
+            <img
+              src="{{ url_for('static', filename='images/LOGO.png') }}"
+              alt="logo"
+            />
+          </a>
+          <p>
+            SmarKet is a unique online platform dedicated to celebrating student
+            creativity.
+          </p>
+          <div class="footer-social">
+            <a href="#" aria-label="Facebook">
+              <i class="fa-brands fa-facebook"></i>
+            </a>
+            <a href="#" aria-label="Instagram">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-link-box">
+          <strong>Main Links</strong>
+          <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('index') }}#category">Categories</a></li>
+            <li><a href="{{ url_for('index') }}#shopping-banner">Shop</a></li>
+            <li><a href="{{ url_for('index') }}#popular">Popular</a></li>
+            <li><a href="{{ url_for('index') }}#recent-products">Recent</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-subscribe">
+          <strong>Subscribe Now</strong>
+          <p>Fresh products, straight to your inbox.</p>
+          <form class="subscribe-box">
+            <input type="email" placeholder="Email" name="subscribe" required />
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>MADE BY SMARKET</span>
+        <span>&copy; COPYRIGHT 2025 - SMARKET</span>
+      </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/password-toggle.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/review_rating.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script type="text/javascript">
+      document.addEventListener("DOMContentLoaded", function () {
+        var socket = io.connect(
+          "http://" + location.hostname + ":" + location.port
+        );
+
+        socket.on("connect", function () {
+          console.log("Socket.IO connected!");
+        });
+
+        socket.on("update_notification_count", function (data) {
+          document.getElementById("notification-count").innerText = data.count;
+        });
+
+        // Chat with Seller functionality
+        document.addEventListener("click", async function (event) {
+          if (event.target.classList.contains("btn-chat-with-seller")) {
+            const productId = event.target.dataset.productId;
+            const sellerId = event.target.dataset.sellerId;
+
+            try {
+              const response = await fetch("/api/conversations/start", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  product_id: productId,
+                  seller_id: sellerId,
+                }),
+              });
+
+              const result = await response.json();
+
+              if (response.ok && result.success) {
+                // Redirect to the chat page for this conversation
+                window.location.href = `/chat/${result.conversation_id}`;
+              } else {
+                alert(result.message || "Failed to start chat.");
+              }
+            } catch (error) {
+              console.error("Error starting chat:", error);
+              alert("An error occurred while trying to start a chat.");
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

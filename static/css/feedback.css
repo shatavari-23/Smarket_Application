@@ -1,0 +1,105 @@
+.feedback-container {
+  max-width: 800px;
+  margin: 4rem auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  font-family: "Poppins", sans-serif;
+}
+.feedback-container h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 1rem; /* Adjusted margin */
+}
+.feedback-container .intro-text {
+  text-align: center;
+  color: #333;
+  margin-bottom: 2rem;
+}
+.feedback-form .form-group {
+  margin-bottom: 1.5rem;
+}
+.feedback-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #555;
+}
+.feedback-form .rating {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.feedback-form .rating .star {
+  font-size: 2.5rem;
+  color: #ddd;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.feedback-form .rating .star:hover,
+.feedback-form .rating .star:hover ~ .star,
+.feedback-form .rating .star.selected,
+.feedback-form .rating .star.selected ~ .star {
+  color: #ffc107;
+}
+.feedback-form textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-height: 150px;
+  font-family: "Poppins", sans-serif;
+  resize: vertical;
+}
+.feedback-form .btn-submit {
+  display: block;
+  width: 100%;
+  padding: 0.8rem;
+  background-color: #2c5e2e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.feedback-form .btn-submit:hover {
+  background-color: #1e4220;
+}
+.feedback-form .btn-submit:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Feedback History Styles */
+.feedback-history-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+
+.rating-display .star-filled {
+  color: #ffc107;
+}
+.rating-display .star-empty {
+  color: #e4e5e9;
+}
+
+.pre-wrap-text {
+  white-space: pre-wrap;
+}
+
+.admin-reply {
+  border-left: 4px solid #2c5e2e;
+  background-color: #f0f8ff;
+  padding: 1rem;
+  margin-top: 1rem;
+  border-radius: 4px;
+}
+.admin-reply.no-reply {
+  background-color: #f9f9f9;
+  border-left: none;
+}
